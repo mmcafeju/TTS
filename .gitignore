@@ -41,3 +41,5 @@ Thumbs.db
 # Data (user-generated)
 data/
 !data/.gitkeep
+# Obsidian
+.obsidian/
