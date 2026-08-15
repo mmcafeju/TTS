@@ -409,8 +409,8 @@ class ModelReadiness(BaseModel):
 
     ``model_name`` is the canonical id used by ``POST /models/download`` so the
     frontend can wire a one-click "Download" button without a second lookup.
-    ``size`` is the user's chosen variant (e.g. "turbo", "0.6B"); ``display_name``
-    is what the checklist row should show ("Whisper Turbo").
+    ``size`` is the user's chosen variant (e.g. "large"); ``display_name``
+    is what the checklist row should show ("Whisper Large").
     """
 
     ready: bool

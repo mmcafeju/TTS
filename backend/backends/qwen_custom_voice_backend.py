@@ -9,7 +9,7 @@ calls generate_custom_voice() instead of generate_voice_clone().
 Key differences from the Base engine:
   - Uses preset speakers (9 built-in voices) instead of zero-shot cloning
   - Supports instruct parameter for tone/emotion/prosody control
-  - Two model sizes: 1.7B and 0.6B
+  - Model size: 1.7B
 
 Languages supported: zh, en, ja, ko, de, fr, ru, pt, es, it
 """
