@@ -10,13 +10,18 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-# Allow users to override the HuggingFace model download directory.
-# Set VOICEBOX_MODELS_DIR to an absolute path before starting the server.
+# Model cache lives inside the app data directory so the whole project is
+# self-contained (copyable to another machine without shared folders).
+# Override with VOICEBOX_MODELS_DIR to point at an absolute path elsewhere.
 # This sets HF_HUB_CACHE so all huggingface_hub downloads go to that path.
 _custom_models_dir = os.environ.get("VOICEBOX_MODELS_DIR")
 if _custom_models_dir:
     os.environ["HF_HUB_CACHE"] = _custom_models_dir
     logger.info("Model download path set to: %s", _custom_models_dir)
+else:
+    _default_hf_cache = Path("data").resolve() / "models" / "hf-cache"
+    os.environ["HF_HUB_CACHE"] = str(_default_hf_cache)
+    logger.info("Model download path set to (default): %s", _default_hf_cache)
 
 # Default data directory (used in development)
 _data_dir = Path("data").resolve()
