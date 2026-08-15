@@ -760,8 +760,13 @@
       }
     },
     "general": {
-      "docs": { "title": "閱讀文件" },
-      "discord": { "title": "加入 Discord", "subtitle": "取得協助與分享聲音" },
+      "docs": {
+        "title": "閱讀文件"
+      },
+      "discord": {
+        "title": "加入 Discord",
+        "subtitle": "取得協助與分享聲音"
+      },
       "serverUrl": {
         "title": "伺服器 URL",
         "description": "Voicebox 後端伺服器的位址。",
@@ -921,13 +926,11 @@
           "small": "Whisper Small · 244M · {{tail}}",
           "medium": "Whisper Medium · 769M · {{tail}}",
           "large": "Whisper Large · 1.5B · {{tail}}",
-          "turbo": "Whisper Turbo · 精簡版 Large v3 · {{tail}}",
           "tail": {
             "fast": "快速",
             "balanced": "平衡",
             "higher": "較高準確度",
-            "best": "最高準確度",
-            "nearBest": "接近最佳,快速"
+            "best": "最高準確度"
           }
         },
         "language": {
@@ -957,11 +960,9 @@
         "model": {
           "title": "精修模型",
           "description": "較大的模型較慢,但對於細微的自我更正與專業詞彙處理得更好。",
-          "size06": "Qwen3 · 0.6B · 400 MB · {{tail}}",
           "size17": "Qwen3 · 1.7B · 1.1 GB · {{tail}}",
           "size40": "Qwen3 · 4B · 2.5 GB · {{tail}}",
           "tail": {
-            "veryFast": "非常快",
             "fast": "快速",
             "fullQuality": "完整品質"
           }

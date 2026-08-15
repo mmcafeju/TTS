@@ -138,29 +138,6 @@ def build_server(cuda=False, rocm=False):
             "backend.services.versions",
             "--hidden-import",
             "pedalboard",
-            "--hidden-import",
-            "chatterbox",
-            "--hidden-import",
-            "chatterbox.tts_turbo",
-            "--hidden-import",
-            "chatterbox.mtl_tts",
-            "--hidden-import",
-            "backend.backends.chatterbox_backend",
-            "--hidden-import",
-            "backend.backends.chatterbox_turbo_backend",
-            # chatterbox multilingual uses spacy_pkuseg for Chinese word
-            # segmentation, which ships pickled dict files (dicts/default.pkl)
-            # and native .so extensions that --hidden-import alone won't bundle.
-            "--collect-all",
-            "spacy_pkuseg",
-            "--hidden-import",
-            "backend.backends.luxtts_backend",
-            "--hidden-import",
-            "zipvoice",
-            "--hidden-import",
-            "zipvoice.luxvoice",
-            "--collect-all",
-            "zipvoice",
             "--collect-all",
             "linacodec",
             "--hidden-import",
@@ -224,85 +201,27 @@ def build_server(cuda=False, rocm=False):
             # at import time — needs .py source files, not just .pyc bytecode
             "--collect-all",
             "inflect",
-            # perth ships pretrained watermark model files (hparams.yaml, .pth.tar)
-            # in perth/perth_net/pretrained/ — needed by chatterbox at runtime
+            # Supertonic 3 — CPU-only ONNX engine. Loaded lazily via the backend
+            # factory, so PyInstaller's static analysis can't see it.
+            "--hidden-import",
+            "backend.backends.supertonic_backend",
+            "--hidden-import",
+            "supertonic",
+            "--hidden-import",
+            "supertonic.loader",
+            "--hidden-import",
+            "supertonic.pipeline",
+            "--hidden-import",
+            "supertonic.core",
+            "--hidden-import",
+            "supertonic.config",
+            "--hidden-import",
+            "supertonic.utils",
+            # onnxruntime ships onnxruntime.dll + onnxruntime_providers_shared.dll
+            # under onnxruntime/capi/ — --hidden-import alone won't bundle the
+            # native DLLs, so collect the whole package.
             "--collect-all",
-            "perth",
-            # piper_phonemize ships espeak-ng-data/ (phoneme tables, language dicts)
-            # needed by LuxTTS for text-to-phoneme conversion
-            "--collect-all",
-            "piper_phonemize",
-            # HumeAI TADA — speech-language model using Llama + flow matching
-            "--hidden-import",
-            "backend.backends.hume_backend",
-            "--hidden-import",
-            "tada",
-            "--hidden-import",
-            "tada.modules",
-            "--hidden-import",
-            "tada.modules.tada",
-            "--hidden-import",
-            "tada.modules.encoder",
-            "--hidden-import",
-            "tada.modules.decoder",
-            "--hidden-import",
-            "tada.modules.aligner",
-            "--hidden-import",
-            "tada.modules.acoustic_spkr_verf",
-            "--hidden-import",
-            "tada.nn",
-            "--hidden-import",
-            "tada.nn.vibevoice",
-            "--hidden-import",
-            "tada.utils",
-            "--hidden-import",
-            "tada.utils.gray_code",
-            "--hidden-import",
-            "tada.utils.text",
-            # DAC shim — provides dac.nn.layers.Snake1d without the real
-            # descript-audio-codec package (which pulls onnx/tensorboard via
-            # descript-audiotools). The shim is in backend/utils/dac_shim.py.
-            "--hidden-import",
-            "backend.utils.dac_shim",
-            "--hidden-import",
-            "torchaudio",
-            "--collect-submodules",
-            "tada",
-            # Kokoro 82M — lightweight TTS engine using misaki G2P
-            # collect-all is required because transformers introspects .py source
-            # files at runtime (e.g. _can_set_attn_implementation opens the class
-            # file); hidden-import alone only bundles bytecode.
-            "--hidden-import",
-            "backend.backends.kokoro_backend",
-            "--collect-all",
-            "kokoro",
-            # misaki ships G2P data files (dictionaries, phoneme tables)
-            # that must be bundled for espeak/en/ja/zh G2P to work
-            "--collect-all",
-            "misaki",
-            # language_tags ships JSON data files (index.json etc.) loaded at
-            # runtime via: misaki → phonemizer → segments → csvw → language_tags
-            "--collect-all",
-            "language_tags",
-            # espeakng_loader ships the entire espeak-ng-data directory (369 files)
-            # loaded at import time by misaki.espeak via get_data_path()
-            "--collect-all",
-            "espeakng_loader",
-            # spacy en_core_web_sm model — misaki.en tries to spacy.cli.download()
-            # at runtime if not found, which calls pip as a subprocess and crashes
-            # the frozen binary. Bundle the model so spacy.util.is_package() passes.
-            "--collect-all",
-            "en_core_web_sm",
-            "--copy-metadata",
-            "en_core_web_sm",
-            "--hidden-import",
-            "en_core_web_sm",
-            # unidic-lite ships the MeCab dictionary used by fugashi (pulled in
-            # by misaki[ja]). The dict lives in unidic_lite/dicdir/ and is
-            # discovered via the package's DICDIR constant, so the data files
-            # must be collected or Japanese Kokoro voices crash at runtime.
-            "--collect-all",
-            "unidic_lite",
+            "onnxruntime",
             "--hidden-import",
             "loguru",
             # MCP server — Streamable-HTTP endpoint and the 4 voicebox.* tools.
@@ -713,17 +632,6 @@ def build_shim():
         "--exclude-module",
         "qwen_tts",
         "--exclude-module",
-        "chatterbox",
-        "--exclude-module",
-        "zipvoice",
-        "--exclude-module",
-        "tada",
-        "--exclude-module",
-        "kokoro",
-        "--exclude-module",
-        "misaki",
-        "--exclude-module",
-        "spacy",
         "--exclude-module",
         "librosa",
         "--exclude-module",

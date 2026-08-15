@@ -160,8 +160,8 @@ export function CapturesTab() {
   const pendingGenerationIds = useGenerationStore((s) => s.pendingGenerationIds);
 
   const { settings: captureSettings, update: updateCaptureSettings } = useCaptureSettings();
-  const sttModel = captureSettings?.stt_model ?? 'turbo';
-  const llmModel = captureSettings?.llm_model ?? '0.6B';
+  const sttModel = captureSettings?.stt_model ?? 'large';
+  const llmModel = captureSettings?.llm_model ?? '1.7B';
   const hotkeyEnabled = captureSettings?.hotkey_enabled ?? false;
   const pushToTalkKeys = captureSettings?.chord_push_to_talk_keys ?? [];
   const toggleToTalkKeys = captureSettings?.chord_toggle_to_talk_keys ?? [];
@@ -264,12 +264,11 @@ export function CapturesTab() {
       const text = capture.transcript_refined || capture.transcript_raw;
       if (!text.trim()) throw new Error(t('captures.noTranscriptError'));
       const language = (capture.language || voice.language) as LanguageCode;
-      // Preset profiles (Kokoro etc.) reject the qwen default — honor the
-      // profile's stored engine preference. Cloned profiles without an
-      // override fall through to whatever the backend picks.
+      // Preset profiles reject the qwen default — honor the profile's
+      // stored engine preference. Cloned profiles without an override fall
+      // through to whatever the backend picks.
       const engine = voice.default_engine as
-        | 'qwen' | 'qwen_custom_voice' | 'luxtts' | 'chatterbox'
-        | 'chatterbox_turbo' | 'tada' | 'kokoro'
+        | 'qwen' | 'qwen_custom_voice' | 'supertonic'
         | undefined;
       return apiClient.generateSpeech({
         profile_id: voice.id,

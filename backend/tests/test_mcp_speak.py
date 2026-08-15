@@ -2,7 +2,7 @@
 
 The MCP speak path used to build its ``GenerationRequest`` without a
 ``model_size``, so every agent-triggered generation silently fell back to the
-schema default ("1.7B") — there was no way to reach 0.6B (or TADA's 1B/3B)
+schema default ("1.7B") — there was no way to reach 0.6B
 through MCP. These tests pin the fix: ``_speak`` now forwards ``model_size``
 straight into the request, matching the REST ``/generate`` surface.
 """
@@ -51,10 +51,10 @@ async def test_speak_forwards_explicit_model_size(captured_request):
         engine="qwen",
         language="en",
         personality=False,
-        model_size="0.6B",
+        model_size="1.7B",
         db=None,
     )
-    assert captured_request["req"].model_size == "0.6B"
+    assert captured_request["req"].model_size == "1.7B"
 
 
 @pytest.mark.asyncio

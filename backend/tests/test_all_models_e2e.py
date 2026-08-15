@@ -47,21 +47,14 @@ class MatrixRow:
     label: str            # human-readable (appears in report)
     engine: str           # /generate engine
     model_size: Optional[str]  # /generate model_size (None = omit)
-    profile_kind: str     # "cloned" | "preset_kokoro" | "preset_qwen_cv"
+    profile_kind: str     # "cloned" | "preset_qwen_cv" | "preset_supertonic"
     model_name: str       # /models/status key for cache lookup
 
 
 MATRIX: list[MatrixRow] = [
-    MatrixRow("qwen 1.7B",              "qwen",              "1.7B", "cloned",          "qwen-tts-1.7B"),
-    MatrixRow("qwen 0.6B",              "qwen",              "0.6B", "cloned",          "qwen-tts-0.6B"),
-    MatrixRow("qwen_custom_voice 1.7B", "qwen_custom_voice", "1.7B", "preset_qwen_cv",  "qwen-custom-voice-1.7B"),
-    MatrixRow("qwen_custom_voice 0.6B", "qwen_custom_voice", "0.6B", "preset_qwen_cv",  "qwen-custom-voice-0.6B"),
-    MatrixRow("luxtts",                 "luxtts",            None,   "cloned",          "luxtts"),
-    MatrixRow("chatterbox",             "chatterbox",        None,   "cloned",          "chatterbox-tts"),
-    MatrixRow("chatterbox_turbo",       "chatterbox_turbo",  None,   "cloned",          "chatterbox-turbo"),
-    MatrixRow("tada 1B",                "tada",              "1B",   "cloned",          "tada-1b"),
-    MatrixRow("tada 3B",                "tada",              "3B",   "cloned",          "tada-3b-ml"),
-    MatrixRow("kokoro",                 "kokoro",            None,   "preset_kokoro",   "kokoro"),
+    MatrixRow("qwen 1.7B",              "qwen",              "1.7B", "cloned",           "qwen-tts-1.7B"),
+    MatrixRow("qwen_custom_voice 1.7B", "qwen_custom_voice", "1.7B", "preset_qwen_cv",   "qwen-custom-voice-1.7B"),
+    MatrixRow("supertonic",             "supertonic",        None,   "preset_supertonic","supertonic-3"),
 ]
 
 TEXT = "The quick brown fox jumps over the lazy dog."
@@ -437,7 +430,7 @@ def parse_args() -> argparse.Namespace:
         "--reference-text",
         help="Transcription of reference-wav (default: read from fixtures/reference_voice.txt)",
     )
-    p.add_argument("--only", help="Comma-separated engines to run (e.g. kokoro,qwen)")
+    p.add_argument("--only", help="Comma-separated engines to run (e.g. supertonic,qwen)")
     p.add_argument("--skip", help="Comma-separated engines to skip")
     p.add_argument("--keep-data-dir", action="store_true", help="Don't delete tempdir after run")
     p.add_argument("--timeout-cached", type=int, default=DEFAULT_TIMEOUT_CACHED)
@@ -537,23 +530,23 @@ def main() -> int:
         with httpx.Client(timeout=30.0) as client:
             # Profile setup (only create what's needed)
             cloned_profile_id: Optional[str] = None
-            kokoro_profile_id: Optional[str] = None
+            supertonic_profile_id: Optional[str] = None
             qwen_cv_profile_id: Optional[str] = None
             needed_kinds = {r.profile_kind for r in rows}
             if "cloned" in needed_kinds:
                 assert ref_wav is not None and ref_text is not None
                 print("[profile] creating cloned profile...", flush=True)
                 cloned_profile_id = create_cloned_profile(client, base_url, ref_wav, ref_text)
-            if "preset_kokoro" in needed_kinds:
-                print("[profile] creating kokoro preset...", flush=True)
-                kokoro_profile_id = create_preset_profile(client, base_url, "e2e-kokoro", "kokoro", "af_heart")
+            if "preset_supertonic" in needed_kinds:
+                print("[profile] creating supertonic preset...", flush=True)
+                supertonic_profile_id = create_preset_profile(client, base_url, "e2e-supertonic", "supertonic", "M1")
             if "preset_qwen_cv" in needed_kinds:
                 print("[profile] creating qwen_custom_voice preset...", flush=True)
                 qwen_cv_profile_id = create_preset_profile(client, base_url, "e2e-qwen-cv", "qwen_custom_voice", "Ryan")
 
             profile_lookup = {
                 "cloned": cloned_profile_id,
-                "preset_kokoro": kokoro_profile_id,
+                "preset_supertonic": supertonic_profile_id,
                 "preset_qwen_cv": qwen_cv_profile_id,
             }
 

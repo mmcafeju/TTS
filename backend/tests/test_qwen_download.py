@@ -10,7 +10,7 @@ Usage:
 Prerequisites:
     - Server must be running: cd backend && python main.py
     - Delete model first for fresh download test:
-      curl -X DELETE http://localhost:8000/models/qwen-tts-0.6B
+      curl -X DELETE http://localhost:8000/models/qwen-tts-1.7B
 """
 
 import asyncio
@@ -175,7 +175,7 @@ async def main():
     print("   ✅ Server is running")
 
     # Test model
-    model_name = "qwen-tts-0.6B"
+    model_name = "qwen-tts-1.7B"
     
     # Check current status
     print(f"\n📊 Checking status of {model_name}...")

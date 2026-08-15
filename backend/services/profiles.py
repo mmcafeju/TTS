@@ -24,7 +24,7 @@ from ..utils.images import process_avatar, validate_image
 
 logger = logging.getLogger(__name__)
 
-CLONING_ENGINES = {"qwen", "luxtts", "chatterbox", "chatterbox_turbo", "tada"}
+CLONING_ENGINES = {"qwen"}
 
 
 def _profile_to_response(
@@ -63,15 +63,15 @@ def _profile_to_response(
 
 
 def _get_preset_voice_ids(engine: str) -> set[str]:
-    if engine == "kokoro":
-        from ..backends.kokoro_backend import KOKORO_VOICES
-
-        return {voice_id for voice_id, _name, _gender, _lang in KOKORO_VOICES}
-
     if engine == "qwen_custom_voice":
         from ..backends.qwen_custom_voice_backend import QWEN_CUSTOM_VOICES
 
         return {voice_id for voice_id, _name, _gender, _lang, _desc in QWEN_CUSTOM_VOICES}
+
+    if engine == "supertonic":
+        from ..backends.supertonic_backend import SUPERTONIC_VOICES
+
+        return {voice_id for voice_id, _name, _gender, _lang in SUPERTONIC_VOICES}
 
     return set()
 

@@ -39,14 +39,13 @@ class MLXTTSBackend:
         Get the MLX model path.
 
         Args:
-            model_size: Model size (1.7B or 0.6B)
+            model_size: Model size (1.7B)
 
         Returns:
             HuggingFace Hub model ID for MLX
         """
         mlx_model_map = {
             "1.7B": "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16",
-            "0.6B": "mlx-community/Qwen3-TTS-12Hz-0.6B-Base-bf16",
         }
 
         if model_size not in mlx_model_map:
@@ -68,7 +67,7 @@ class MLXTTSBackend:
         Lazy load the MLX TTS model.
 
         Args:
-            model_size: Model size to load (1.7B or 0.6B)
+            model_size: Model size to load (1.7B)
         """
         if model_size is None:
             model_size = self.model_size
@@ -284,7 +283,7 @@ class MLXSTTBackend:
         Lazy load the MLX Whisper model.
 
         Args:
-            model_size: Model size (tiny, base, small, medium, large)
+            model_size: Model size (large, turbo)
         """
         if model_size is None:
             model_size = self.model_size

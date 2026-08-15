@@ -179,10 +179,10 @@ def score(
 
 DEFAULT_PORTS = (8000, 8765, 8899, 17493)
 THROWAWAY_PROFILE_PREFIX = "personality-harness-"
-KOKORO_PROBE_VOICE = "af_heart"
-"""Any valid kokoro voice id works — compose never calls into TTS, it
+SUPERTONIC_PROBE_VOICE = "M1"
+"""Any valid Supertonic voice id works — compose never calls into TTS, it
 just needs a profile row with a personality attached. We pick a
-known-shipping Kokoro voice so the throwaway profile satisfies the
+known-shipping Supertonic voice so the throwaway profile satisfies the
 preset-engine validator on creation."""
 
 
@@ -212,7 +212,7 @@ def detect_backend_port(hint: Optional[int]) -> int:
 def create_throwaway_profile(
     client: httpx.Client, port: int, personality: Personality, model: str
 ) -> str:
-    """Create a preset Kokoro profile with the test personality. Returns
+    """Create a preset Supertonic profile with the test personality. Returns
     the profile id. Tests delete it in a finally block."""
     name = f"{THROWAWAY_PROFILE_PREFIX}{personality.name}-{model}-{int(time.time())}"
     resp = client.post(
@@ -222,9 +222,9 @@ def create_throwaway_profile(
             "description": f"Throwaway profile for personality harness ({model}).",
             "language": "en",
             "voice_type": "preset",
-            "preset_engine": "kokoro",
-            "preset_voice_id": KOKORO_PROBE_VOICE,
-            "default_engine": "kokoro",
+            "preset_engine": "supertonic",
+            "preset_voice_id": SUPERTONIC_PROBE_VOICE,
+            "default_engine": "supertonic",
             "personality": personality.description,
         },
         timeout=30.0,
@@ -285,11 +285,11 @@ def format_report(cards: list[Scorecard]) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--port", type=int, default=None)
-    ap.add_argument("--model", choices=("0.6B", "1.7B", "4B"), action="append")
+    ap.add_argument("--model", choices=("1.7B", "4B"), action="append")
     ap.add_argument("--json", type=Path, default=None)
     args = ap.parse_args()
 
-    models = tuple(args.model) if args.model else ("0.6B", "4B")
+    models = tuple(args.model) if args.model else ("1.7B",)
     port = detect_backend_port(args.port)
     print(f"backend → http://127.0.0.1:{port}")
     print(f"personalities → {len(PERSONALITIES)}, models → {models}")

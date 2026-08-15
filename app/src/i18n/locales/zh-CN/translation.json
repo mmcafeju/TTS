@@ -760,8 +760,13 @@
       }
     },
     "general": {
-      "docs": { "title": "阅读文档" },
-      "discord": { "title": "加入 Discord", "subtitle": "获取帮助 & 分享声音" },
+      "docs": {
+        "title": "阅读文档"
+      },
+      "discord": {
+        "title": "加入 Discord",
+        "subtitle": "获取帮助 & 分享声音"
+      },
       "serverUrl": {
         "title": "服务器 URL",
         "description": "Voicebox 后端服务器的地址。",
@@ -921,13 +926,11 @@
           "small": "Whisper Small · 244M · {{tail}}",
           "medium": "Whisper Medium · 769M · {{tail}}",
           "large": "Whisper Large · 1.5B · {{tail}}",
-          "turbo": "Whisper Turbo · 精简版 Large v3 · {{tail}}",
           "tail": {
             "fast": "快速",
             "balanced": "均衡",
             "higher": "更高准确度",
-            "best": "最佳准确度",
-            "nearBest": "接近最佳,速度快"
+            "best": "最佳准确度"
           }
         },
         "language": {
@@ -957,11 +960,9 @@
         "model": {
           "title": "精修模型",
           "description": "更大的模型速度较慢,但能更好地处理细微的自我纠正和技术词汇。",
-          "size06": "Qwen3 · 0.6B · 400 MB · {{tail}}",
           "size17": "Qwen3 · 1.7B · 1.1 GB · {{tail}}",
           "size40": "Qwen3 · 4B · 2.5 GB · {{tail}}",
           "tail": {
-            "veryFast": "非常快",
             "fast": "快速",
             "fullQuality": "完整质量"
           }

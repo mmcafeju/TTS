@@ -379,7 +379,7 @@
       "play": "Riproduci campione",
       "pause": "Pausa campione",
       "stop": "Interrompi",
-            "stopAria": "Interrompi riproduzione",
+      "stopAria": "Interrompi riproduzione",
       "position": "Posizione riproduzione campione",
       "positionValue": "{{current}} di {{total}}"
     },
@@ -926,13 +926,11 @@
           "small": "Whisper Small · 244M · {{tail}}",
           "medium": "Whisper Medium · 769M · {{tail}}",
           "large": "Whisper Large · 1.5B · {{tail}}",
-          "turbo": "Whisper Turbo · Large v3 ridotto · {{tail}}",
           "tail": {
             "fast": "Veloce",
             "balanced": "Bilanciato",
             "higher": "Precisione superiore",
-            "best": "Massima precisione",
-            "nearBest": "Precisione quasi massima, veloce"
+            "best": "Massima precisione"
           }
         },
         "language": {
@@ -962,11 +960,9 @@
         "model": {
           "title": "Modello di perfezionamento",
           "description": "I modelli più grandi sono più lenti ma gestiscono meglio le sottili autocorrezioni e il vocabolario tecnico.",
-          "size06": "Qwen3 · 0.6B · 400 MB · {{tail}}",
           "size17": "Qwen3 · 1.7B · 1.1 GB · {{tail}}",
           "size40": "Qwen3 · 4B · 2.5 GB · {{tail}}",
           "tail": {
-            "veryFast": "Molto veloce",
             "fast": "Veloce",
             "fullQuality": "Massima qualità"
           }
@@ -1124,7 +1120,8 @@
         "title": "Passa al backend CPU",
         "description": "Disabilita l'accelerazione GPU. Potrai scaricare nuovamente il backend GPU in un secondo momento.",
         "button": "Passa a CPU"
-      },      "remove": {
+      },
+      "remove": {
         "title": "Rimuovi il backend CUDA",
         "description": "Elimina il file binario CUDA scaricato per liberare spazio sul disco.",
         "button": "Rimuovi"

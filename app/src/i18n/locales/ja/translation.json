@@ -760,8 +760,13 @@
       }
     },
     "general": {
-      "docs": { "title": "ドキュメントを読む" },
-      "discord": { "title": "Discord に参加", "subtitle": "ヘルプやボイスの共有" },
+      "docs": {
+        "title": "ドキュメントを読む"
+      },
+      "discord": {
+        "title": "Discord に参加",
+        "subtitle": "ヘルプやボイスの共有"
+      },
       "serverUrl": {
         "title": "サーバー URL",
         "description": "Voicebox バックエンドサーバーのアドレス。",
@@ -921,13 +926,11 @@
           "small": "Whisper Small · 244M · {{tail}}",
           "medium": "Whisper Medium · 769M · {{tail}}",
           "large": "Whisper Large · 1.5B · {{tail}}",
-          "turbo": "Whisper Turbo · Pruned Large v3 · {{tail}}",
           "tail": {
             "fast": "高速",
             "balanced": "バランス",
             "higher": "高精度",
-            "best": "最高精度",
-            "nearBest": "ほぼ最高精度かつ高速"
+            "best": "最高精度"
           }
         },
         "language": {
@@ -957,11 +960,9 @@
         "model": {
           "title": "整形モデル",
           "description": "大きなモデルは遅くなりますが、微妙な自己修正や専門用語をより適切に処理します。",
-          "size06": "Qwen3 · 0.6B · 400 MB · {{tail}}",
           "size17": "Qwen3 · 1.7B · 1.1 GB · {{tail}}",
           "size40": "Qwen3 · 4B · 2.5 GB · {{tail}}",
           "tail": {
-            "veryFast": "超高速",
             "fast": "高速",
             "fullQuality": "高品質"
           }

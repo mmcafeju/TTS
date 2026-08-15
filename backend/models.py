@@ -1,4 +1,4 @@
-"""
+﻿"""
 Pydantic models for request/response validation.
 """
 
@@ -18,7 +18,8 @@ class VoiceProfileCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     description: Optional[str] = Field(None, max_length=500)
     language: str = Field(
-        default="en", pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$"
+        default="en",
+        pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|bg|cs|et|hr|hu|id|lt|lv|ro|sk|sl|uk|vi)$",
     )
     voice_type: Optional[str] = Field(default="cloned", pattern="^(cloned|preset|designed)$")
     preset_engine: Optional[str] = Field(None, max_length=50)
@@ -81,11 +82,11 @@ class GenerationRequest(BaseModel):
 
     profile_id: str
     text: str = Field(..., min_length=1, max_length=50000)
-    language: str = Field(default="en", pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$")
+    language: str = Field(default="en", pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|bg|cs|et|hr|hu|id|lt|lv|ro|sk|sl|uk|vi)$")
     seed: Optional[int] = Field(None, ge=0)
-    model_size: Optional[str] = Field(default="1.7B", pattern="^(1\\.7B|0\\.6B|1B|3B)$")
+    model_size: Optional[str] = Field(default="1.7B", pattern="^(1\\.7B)$")
     instruct: Optional[str] = Field(None, max_length=500)
-    engine: Optional[str] = Field(default="qwen", pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro)$")
+    engine: Optional[str] = Field(default="qwen", pattern="^(qwen|qwen_custom_voice|supertonic)$")
     personality: bool = Field(
         default=False,
         description="When true and the profile has a personality prompt, the input text is rewritten in-character before TTS.",
@@ -172,7 +173,7 @@ class TranscriptionRequest(BaseModel):
     """Request model for audio transcription."""
 
     language: Optional[str] = Field(None, pattern="^(en|zh|ja|ko|de|fr|ru|pt|es|it)$")
-    model: Optional[str] = Field(None, pattern="^(base|small|medium|large|turbo)$")
+    model: Optional[str] = Field(None, pattern="^(large|turbo)$")
 
 
 class TranscriptionResponse(BaseModel):
@@ -220,7 +221,7 @@ class CaptureCreateResponse(CaptureResponse):
     """
     Response model for ``POST /captures``.
 
-    Adds ``auto_refine`` and ``allow_auto_paste`` — the server-side settings
+    Adds ``auto_refine`` and ``allow_auto_paste`` ??the server-side settings
     captured at the moment the capture was created. The client reads these to
     decide whether to chain a refinement request and whether to fire the
     synthetic-paste pipeline, so it doesn't need a synced local copy of the
@@ -235,23 +236,23 @@ class CaptureRefineRequest(BaseModel):
     """Request to refine a capture's transcript via the LLM."""
 
     flags: Optional[RefinementFlagsModel] = None
-    model_size: Optional[str] = Field(default=None, pattern="^(0\\.6B|1\\.7B|4B)$")
+    model_size: Optional[str] = Field(default=None, pattern="^(0\\.6B|1\\.7B)$")
 
 
 class CaptureRetranscribeRequest(BaseModel):
     """Request to re-run STT on a capture's audio with a different model."""
 
-    model: Optional[str] = Field(None, pattern="^(base|small|medium|large|turbo)$")
+    model: Optional[str] = Field(None, pattern="^(large|turbo)$")
     language: Optional[str] = Field(None, pattern="^(en|zh|ja|ko|de|fr|ru|pt|es|it)$")
 
 
 class CaptureSettingsResponse(BaseModel):
     """Server-persisted defaults for the capture / refine flow."""
 
-    stt_model: str = Field(default="turbo", pattern="^(base|small|medium|large|turbo)$")
+    stt_model: str = Field(default="large", pattern="^(large)$")
     language: str = Field(default="auto")
     auto_refine: bool = True
-    llm_model: str = Field(default="0.6B", pattern="^(0\\.6B|1\\.7B|4B)$")
+    llm_model: str = Field(default="1.7B", pattern="^(1\\.7B)$")
     smart_cleanup: bool = True
     self_correction: bool = True
     preserve_technical: bool = True
@@ -270,12 +271,12 @@ class CaptureSettingsResponse(BaseModel):
 
 
 class CaptureSettingsUpdate(BaseModel):
-    """Partial update for capture settings — every field is optional."""
+    """Partial update for capture settings ??every field is optional."""
 
-    stt_model: Optional[str] = Field(default=None, pattern="^(base|small|medium|large|turbo)$")
+    stt_model: Optional[str] = Field(default=None, pattern="^(large)$")
     language: Optional[str] = None
     auto_refine: Optional[bool] = None
-    llm_model: Optional[str] = Field(default=None, pattern="^(0\\.6B|1\\.7B|4B)$")
+    llm_model: Optional[str] = Field(default=None, pattern="^(1\\.7B)$")
     smart_cleanup: Optional[bool] = None
     self_correction: Optional[bool] = None
     preserve_technical: Optional[bool] = None
@@ -299,7 +300,7 @@ class GenerationSettingsResponse(BaseModel):
 
 
 class GenerationSettingsUpdate(BaseModel):
-    """Partial update for generation settings — every field is optional."""
+    """Partial update for generation settings ??every field is optional."""
 
     max_chunk_chars: Optional[int] = Field(default=None, ge=100, le=5000)
     crossfade_ms: Optional[int] = Field(default=None, ge=0, le=500)
@@ -308,7 +309,7 @@ class GenerationSettingsUpdate(BaseModel):
 
 
 class MCPClientBindingResponse(BaseModel):
-    """Per-MCP-client voice binding — what voice / engine the server should
+    """Per-MCP-client voice binding ??what voice / engine the server should
     use when a given client_id calls voicebox.speak without args, plus an
     opt-in personality-rewrite default."""
 
@@ -317,7 +318,7 @@ class MCPClientBindingResponse(BaseModel):
     profile_id: Optional[str] = None
     default_engine: Optional[str] = Field(
         None,
-        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro)$",
+        pattern="^(qwen|qwen_custom_voice|supertonic)$",
     )
     default_personality: bool = False
     last_seen_at: Optional[datetime] = None
@@ -336,7 +337,7 @@ class MCPClientBindingUpsert(BaseModel):
     profile_id: Optional[str] = None
     default_engine: Optional[str] = Field(
         None,
-        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro)$",
+        pattern="^(qwen|qwen_custom_voice|supertonic)$",
     )
     default_personality: bool = False
 
@@ -346,7 +347,7 @@ class MCPClientBindingListResponse(BaseModel):
 
 
 class SpeakRequest(BaseModel):
-    """Body for POST /speak — non-MCP REST surface that mirrors voicebox.speak."""
+    """Body for POST /speak ??non-MCP REST surface that mirrors voicebox.speak."""
 
     text: str = Field(..., min_length=1, max_length=10000)
     profile: Optional[str] = Field(
@@ -355,7 +356,7 @@ class SpeakRequest(BaseModel):
     )
     engine: Optional[str] = Field(
         None,
-        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro)$",
+        pattern="^(qwen|qwen_custom_voice|supertonic)$",
     )
     personality: Optional[bool] = Field(
         None,
@@ -372,7 +373,7 @@ class LLMGenerateRequest(BaseModel):
 
     prompt: str = Field(..., min_length=1, max_length=50000)
     system: Optional[str] = Field(None, max_length=4000)
-    model_size: Optional[str] = Field(default="0.6B", pattern="^(0\\.6B|1\\.7B|4B)$")
+    model_size: Optional[str] = Field(default="1.7B", pattern="^(1\\.7B)$")
     max_tokens: int = Field(default=512, ge=1, le=4096)
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
     # Few-shot (user, assistant) pairs prepended as real chat turns.
@@ -389,7 +390,7 @@ class LLMGenerateResponse(BaseModel):
     model_size: str
 
 
-# ── Profile personality endpoint ──────────────────────────────────────
+# ——— Profile personality endpoint ———
 # The sole standalone personality endpoint is ``/profiles/{id}/compose``,
 # which produces a fresh in-character utterance the UI drops into the
 # generate textarea. Rewrite is now reached via ``/generate`` with
@@ -443,7 +444,7 @@ class HealthResponse(BaseModel):
     vram_used_mb: Optional[float] = None
     backend_type: Optional[str] = None  # Backend type (mlx or pytorch)
     backend_variant: Optional[str] = None  # Binary variant (cpu, cuda, or rocm)
-    supports_rocm: bool = False  # AMD GPU on Windows — the ROCm backend is applicable
+    supports_rocm: bool = False  # AMD GPU on Windows ??the ROCm backend is applicable
     gpu_compatibility_warning: Optional[str] = None  # Warning if GPU arch unsupported
 
 
@@ -796,7 +797,7 @@ class AvailableEffectsResponse(BaseModel):
     effects: List[AvailableEffect]
 
 
-# ─── Cloud (backup & sync) ──────────────────────────────────────────────
+# ——— Cloud (backup & sync) ———
 
 
 class CloudLoginStartResponse(BaseModel):

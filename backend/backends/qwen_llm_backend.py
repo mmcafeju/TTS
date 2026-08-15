@@ -24,13 +24,11 @@ logger = logging.getLogger(__name__)
 
 
 PYTORCH_HF_REPOS = {
-    "0.6B": "Qwen/Qwen3-0.6B",
     "1.7B": "Qwen/Qwen3-1.7B",
     "4B": "Qwen/Qwen3-4B",
 }
 
 MLX_HF_REPOS = {
-    "0.6B": "mlx-community/Qwen3-0.6B-4bit",
     "1.7B": "mlx-community/Qwen3-1.7B-4bit",
     "4B": "mlx-community/Qwen3-4B-4bit",
 }
@@ -59,7 +57,7 @@ def _build_messages(
 class PyTorchQwenLLMBackend:
     """Qwen3 LLM backend using HuggingFace transformers."""
 
-    def __init__(self, model_size: str = "0.6B"):
+    def __init__(self, model_size: str = "1.7B"):
         self.model = None
         self.tokenizer = None
         self.model_size = model_size
@@ -185,7 +183,7 @@ class PyTorchQwenLLMBackend:
 class MLXQwenLLMBackend:
     """Qwen3 LLM backend using mlx-lm (Apple Silicon)."""
 
-    def __init__(self, model_size: str = "0.6B"):
+    def __init__(self, model_size: str = "1.7B"):
         self.model = None
         self.tokenizer = None
         self.model_size = model_size

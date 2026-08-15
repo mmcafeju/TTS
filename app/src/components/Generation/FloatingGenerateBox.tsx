@@ -25,7 +25,6 @@ import { useGenerationStore } from '@/stores/generationStore';
 import { useStoryStore } from '@/stores/storyStore';
 import { useUIStore } from '@/stores/uiStore';
 import { EngineModelSelector } from './EngineModelSelector';
-import { ParalinguisticInput } from './ParalinguisticInput';
 
 interface FloatingGenerateBoxProps {
   isPlayerOpen?: boolean;
@@ -146,12 +145,8 @@ export function FloatingGenerateBox({
   // Sync generation form language, engine, and effects with selected profile
   type EngineValue =
     | 'qwen'
-    | 'luxtts'
-    | 'chatterbox'
-    | 'chatterbox_turbo'
-    | 'tada'
-    | 'kokoro'
-    | 'qwen_custom_voice';
+    | 'qwen_custom_voice'
+    | 'supertonic';
   useEffect(() => {
     if (selectedProfile?.language) {
       form.setValue('language', selectedProfile.language as LanguageCode);
@@ -163,7 +158,7 @@ export function FloatingGenerateBox({
     } else if (selectedProfile && selectedProfile.voice_type !== 'preset') {
       // Cloned/designed profile with no default — ensure a compatible (non-preset) engine
       const currentEngine = form.getValues('engine');
-      const presetEngines = new Set(['kokoro', 'qwen_custom_voice']);
+      const presetEngines = new Set(['qwen_custom_voice', 'supertonic']);
       if (currentEngine && presetEngines.has(currentEngine)) {
         form.setValue('engine', 'qwen');
       }
@@ -292,57 +287,32 @@ export function FloatingGenerateBox({
                           transition={{ duration: 0.15, ease: 'easeOut' }}
                           style={{ overflow: 'hidden' }}
                         >
-                          {form.watch('engine') === 'chatterbox_turbo' ? (
-                            <ParalinguisticInput
-                              value={field.value}
-                              onChange={field.onChange}
-                              placeholder={
-                                isStoriesRoute && currentStory
-                                  ? t('generation.placeholder.storyWithEffects', {
-                                      name: currentStory.name,
+                          <Textarea
+                            {...field}
+                            ref={(node: HTMLTextAreaElement | null) => {
+                              textareaRef.current = node;
+                              if (typeof field.ref === 'function') {
+                                field.ref(node);
+                              }
+                            }}
+                            placeholder={
+                              isStoriesRoute && currentStory
+                                ? t('generation.placeholder.story', { name: currentStory.name })
+                                : selectedProfile
+                                  ? t('generation.placeholder.profile', {
+                                      name: selectedProfile.name,
                                     })
-                                  : selectedProfile
-                                    ? t('generation.placeholder.effectsHint')
-                                    : t('generation.placeholder.selectVoice')
-                              }
-                              className="px-3 py-2 resize-none bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none focus:ring-0 outline-none ring-0 rounded-2xl text-sm w-full"
-                              style={{
-                                minHeight: isExpanded ? '100px' : '32px',
-                                maxHeight: '300px',
-                                overflowY: 'auto',
-                              }}
-                              disabled={!selectedProfileId}
-                              onClick={() => setIsExpanded(true)}
-                              onFocus={() => setIsExpanded(true)}
-                            />
-                          ) : (
-                            <Textarea
-                              {...field}
-                              ref={(node: HTMLTextAreaElement | null) => {
-                                textareaRef.current = node;
-                                if (typeof field.ref === 'function') {
-                                  field.ref(node);
-                                }
-                              }}
-                              placeholder={
-                                isStoriesRoute && currentStory
-                                  ? t('generation.placeholder.story', { name: currentStory.name })
-                                  : selectedProfile
-                                    ? t('generation.placeholder.profile', {
-                                        name: selectedProfile.name,
-                                      })
-                                    : t('generation.placeholder.selectVoice')
-                              }
-                              className="resize-none bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none focus:ring-0 outline-none ring-0 rounded-2xl text-sm placeholder:text-muted-foreground/60 w-full"
-                              style={{
-                                minHeight: isExpanded ? '100px' : '32px',
-                                maxHeight: '300px',
-                              }}
-                              disabled={!selectedProfileId}
-                              onClick={() => setIsExpanded(true)}
-                              onFocus={() => setIsExpanded(true)}
-                            />
-                          )}
+                                  : t('generation.placeholder.selectVoice')
+                            }
+                            className="resize-none bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none focus:ring-0 outline-none ring-0 rounded-2xl text-sm placeholder:text-muted-foreground/60 w-full"
+                            style={{
+                              minHeight: isExpanded ? '100px' : '32px',
+                              maxHeight: '300px',
+                            }}
+                            disabled={!selectedProfileId}
+                            onClick={() => setIsExpanded(true)}
+                            onFocus={() => setIsExpanded(true)}
+                          />
                         </motion.div>
                       </FormControl>
                       <FormMessage className="text-xs" />

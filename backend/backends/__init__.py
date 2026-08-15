@@ -37,11 +37,7 @@ LANGUAGE_CODE_TO_NAME = {
 }
 
 WHISPER_HF_REPOS = {
-    "base": "openai/whisper-base",
-    "small": "openai/whisper-small",
-    "medium": "openai/whisper-medium",
     "large": "openai/whisper-large-v3",
-    "turbo": "openai/whisper-large-v3-turbo",
 }
 
 
@@ -49,10 +45,10 @@ WHISPER_HF_REPOS = {
 class ModelConfig:
     """Declarative config for a downloadable model variant."""
 
-    model_name: str  # e.g. "luxtts", "chatterbox-tts"
-    display_name: str  # e.g. "LuxTTS (Fast, CPU-friendly)"
-    engine: str  # e.g. "luxtts", "chatterbox"
-    hf_repo_id: str  # e.g. "YatharthS/LuxTTS"
+    model_name: str  # e.g. "supertonic-3"
+    display_name: str  # e.g. "Supertonic 3"
+    engine: str  # e.g. "supertonic"
+    hf_repo_id: str  # e.g. "Supertone/supertonic-3"
     model_size: str = "default"
     size_mb: int = 0
     needs_trim: bool = False
@@ -211,11 +207,7 @@ _llm_backends_lock = threading.Lock()
 TTS_ENGINES = {
     "qwen": "Qwen TTS",
     "qwen_custom_voice": "Qwen CustomVoice",
-    "luxtts": "LuxTTS",
-    "chatterbox": "Chatterbox TTS",
-    "chatterbox_turbo": "Chatterbox Turbo",
-    "tada": "TADA",
-    "kokoro": "Kokoro",
+    "supertonic": "Supertonic",
 }
 
 LLM_ENGINES = {
@@ -228,10 +220,8 @@ def _get_qwen_model_configs() -> list[ModelConfig]:
     backend_type = get_backend_type()
     if backend_type == "mlx":
         repo_1_7b = "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16"
-        repo_0_6b = "mlx-community/Qwen3-TTS-12Hz-0.6B-Base-bf16"
     else:
         repo_1_7b = "Qwen/Qwen3-TTS-12Hz-1.7B-Base"
-        repo_0_6b = "Qwen/Qwen3-TTS-12Hz-0.6B-Base"
 
     # mlx-audio can continue after an EOS miss with silence followed by
     # codec noise. Retry only the affected text as smaller chunks.
@@ -247,17 +237,6 @@ def _get_qwen_model_configs() -> list[ModelConfig]:
             size_mb=3500,
             retries_runaway=retries_runaway,
             supports_instruct=False,  # Base model drops instruct silently
-            languages=["zh", "en", "ja", "ko", "de", "fr", "ru", "pt", "es", "it"],
-        ),
-        ModelConfig(
-            model_name="qwen-tts-0.6B",
-            display_name="Qwen TTS 0.6B",
-            engine="qwen",
-            hf_repo_id=repo_0_6b,
-            model_size="0.6B",
-            size_mb=1200,
-            retries_runaway=retries_runaway,
-            supports_instruct=False,
             languages=["zh", "en", "ja", "ko", "de", "fr", "ru", "pt", "es", "it"],
         ),
     ]
@@ -276,16 +255,6 @@ def _get_qwen_custom_voice_configs() -> list[ModelConfig]:
             supports_instruct=True,
             languages=["zh", "en", "ja", "ko", "de", "fr", "ru", "pt", "es", "it"],
         ),
-        ModelConfig(
-            model_name="qwen-custom-voice-0.6B",
-            display_name="Qwen CustomVoice 0.6B",
-            engine="qwen_custom_voice",
-            hf_repo_id="Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice",
-            model_size="0.6B",
-            size_mb=1200,
-            supports_instruct=True,
-            languages=["zh", "en", "ja", "ko", "de", "fr", "ru", "pt", "es", "it"],
-        ),
     ]
 
 
@@ -296,121 +265,29 @@ def _get_non_qwen_tts_configs() -> list[ModelConfig]:
     """
     return [
         ModelConfig(
-            model_name="luxtts",
-            display_name="LuxTTS (Fast, CPU-friendly)",
-            engine="luxtts",
-            hf_repo_id="YatharthS/LuxTTS",
-            size_mb=300,
-            languages=["en"],
-        ),
-        ModelConfig(
-            model_name="chatterbox-tts",
-            display_name="Chatterbox TTS (Multilingual)",
-            engine="chatterbox",
-            hf_repo_id="ResembleAI/chatterbox",
-            size_mb=3200,
-            needs_trim=True,
+            model_name="supertonic-3",
+            display_name="Supertonic 3 (99M, CPU)",
+            engine="supertonic",
+            hf_repo_id="Supertone/supertonic-3",
+            size_mb=400,
             languages=[
-                "zh",
-                "en",
-                "ja",
-                "ko",
-                "de",
-                "fr",
-                "ru",
-                "pt",
-                "es",
-                "it",
-                "he",
-                "ar",
-                "da",
-                "el",
-                "fi",
-                "hi",
-                "ms",
-                "nl",
-                "no",
-                "pl",
-                "sv",
-                "sw",
-                "tr",
+                "en", "ko", "ja", "ar", "bg", "cs", "da", "de", "el", "es",
+                "et", "fi", "fr", "hi", "hr", "hu", "id", "it", "lt", "lv",
+                "nl", "pl", "pt", "ro", "ru", "sk", "sl", "sv", "tr", "uk", "vi",
             ],
-        ),
-        ModelConfig(
-            model_name="chatterbox-turbo",
-            display_name="Chatterbox Turbo (English, Tags)",
-            engine="chatterbox_turbo",
-            hf_repo_id="ResembleAI/chatterbox-turbo",
-            size_mb=1500,
-            needs_trim=True,
-            languages=["en"],
-        ),
-        ModelConfig(
-            model_name="tada-1b",
-            display_name="TADA 1B (English)",
-            engine="tada",
-            hf_repo_id="HumeAI/tada-1b",
-            model_size="1B",
-            size_mb=4000,
-            languages=["en"],
-        ),
-        ModelConfig(
-            model_name="tada-3b-ml",
-            display_name="TADA 3B Multilingual",
-            engine="tada",
-            hf_repo_id="HumeAI/tada-3b-ml",
-            model_size="3B",
-            size_mb=8000,
-            languages=["en", "ar", "zh", "de", "es", "fr", "it", "ja", "pl", "pt"],
-        ),
-        ModelConfig(
-            model_name="kokoro",
-            display_name="Kokoro 82M",
-            engine="kokoro",
-            hf_repo_id="hexgrad/Kokoro-82M",
-            size_mb=350,
-            languages=["en", "es", "fr", "hi", "it", "pt", "ja", "zh"],
         ),
     ]
 
 
 def _get_whisper_configs() -> list[ModelConfig]:
-    """Return Whisper STT model configs."""
+    """Return Whisper STT model configs (new-generation v3 variants only)."""
     return [
-        ModelConfig(
-            model_name="whisper-base",
-            display_name="Whisper Base",
-            engine="whisper",
-            hf_repo_id="openai/whisper-base",
-            model_size="base",
-        ),
-        ModelConfig(
-            model_name="whisper-small",
-            display_name="Whisper Small",
-            engine="whisper",
-            hf_repo_id="openai/whisper-small",
-            model_size="small",
-        ),
-        ModelConfig(
-            model_name="whisper-medium",
-            display_name="Whisper Medium",
-            engine="whisper",
-            hf_repo_id="openai/whisper-medium",
-            model_size="medium",
-        ),
         ModelConfig(
             model_name="whisper-large",
             display_name="Whisper Large",
             engine="whisper",
             hf_repo_id="openai/whisper-large-v3",
             model_size="large",
-        ),
-        ModelConfig(
-            model_name="whisper-turbo",
-            display_name="Whisper Turbo",
-            engine="whisper",
-            hf_repo_id="openai/whisper-large-v3-turbo",
-            model_size="turbo",
         ),
     ]
 
@@ -423,13 +300,9 @@ def _get_qwen_llm_configs() -> list[ModelConfig]:
     """
     backend_type = get_backend_type()
     if backend_type == "mlx":
-        repo_0_6 = "mlx-community/Qwen3-0.6B-4bit"
         repo_1_7 = "mlx-community/Qwen3-1.7B-4bit"
-        repo_4 = "mlx-community/Qwen3-4B-4bit"
     else:
-        repo_0_6 = "Qwen/Qwen3-0.6B"
         repo_1_7 = "Qwen/Qwen3-1.7B"
-        repo_4 = "Qwen/Qwen3-4B"
 
     common_languages = [
         "en", "zh", "ja", "ko", "de", "fr", "ru", "pt", "es", "it",
@@ -437,30 +310,12 @@ def _get_qwen_llm_configs() -> list[ModelConfig]:
 
     return [
         ModelConfig(
-            model_name="qwen3-0.6b",
-            display_name="Qwen3 0.6B",
-            engine="qwen_llm",
-            hf_repo_id=repo_0_6,
-            model_size="0.6B",
-            size_mb=400 if backend_type == "mlx" else 1400,
-            languages=common_languages,
-        ),
-        ModelConfig(
             model_name="qwen3-1.7b",
             display_name="Qwen3 1.7B",
             engine="qwen_llm",
             hf_repo_id=repo_1_7,
             model_size="1.7B",
             size_mb=1100 if backend_type == "mlx" else 3500,
-            languages=common_languages,
-        ),
-        ModelConfig(
-            model_name="qwen3-4b",
-            display_name="Qwen3 4B",
-            engine="qwen_llm",
-            hf_repo_id=repo_4,
-            model_size="4B",
-            size_mb=2500 if backend_type == "mlx" else 8000,
             languages=common_languages,
         ),
     ]
@@ -530,8 +385,6 @@ async def load_engine_model(engine: str, model_size: str = "default") -> None:
     backend = get_tts_backend_for_engine(engine)
     if engine in ("qwen", "qwen_custom_voice"):
         await backend.load_model_async(model_size)
-    elif engine == "tada":
-        await backend.load_model(model_size)
     else:
         await backend.load_model()
 
@@ -547,7 +400,7 @@ async def ensure_model_cached_or_raise(engine: str, model_size: str = "default")
             cfg = c
             break
 
-    if engine in ("qwen", "qwen_custom_voice", "tada"):
+    if engine in ("qwen", "qwen_custom_voice"):
         if not backend._is_model_cached(model_size):
             raise HTTPException(
                 status_code=400,
@@ -672,7 +525,7 @@ def get_tts_backend_for_engine(engine: str) -> TTSBackend:
     Get or create a TTS backend for the given engine.
 
     Args:
-        engine: Engine name (e.g. "qwen", "luxtts", "chatterbox", "chatterbox_turbo")
+        engine: Engine name (e.g. "qwen", "supertonic")
 
     Returns:
         TTS backend instance
@@ -699,26 +552,10 @@ def get_tts_backend_for_engine(engine: str) -> TTSBackend:
                 from .pytorch_backend import PyTorchTTSBackend
 
                 backend = PyTorchTTSBackend()
-        elif engine == "luxtts":
-            from .luxtts_backend import LuxTTSBackend
+        elif engine == "supertonic":
+            from .supertonic_backend import SupertonicBackend
 
-            backend = LuxTTSBackend()
-        elif engine == "chatterbox":
-            from .chatterbox_backend import ChatterboxTTSBackend
-
-            backend = ChatterboxTTSBackend()
-        elif engine == "chatterbox_turbo":
-            from .chatterbox_turbo_backend import ChatterboxTurboTTSBackend
-
-            backend = ChatterboxTurboTTSBackend()
-        elif engine == "tada":
-            from .hume_backend import HumeTadaBackend
-
-            backend = HumeTadaBackend()
-        elif engine == "kokoro":
-            from .kokoro_backend import KokoroTTSBackend
-
-            backend = KokoroTTSBackend()
+            backend = SupertonicBackend()
         elif engine == "qwen_custom_voice":
             from .qwen_custom_voice_backend import QwenCustomVoiceBackend
 

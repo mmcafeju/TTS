@@ -14,43 +14,10 @@ accelerate>=0.26.0
 huggingface_hub>=0.20.0
 qwen-tts>=0.0.5
 
-# LuxTTS (voice cloning engine)
-# piper-phonemize needs custom index (no PyPI wheels)
---find-links https://k2-fsa.github.io/icefall/piper_phonemize.html
-# linacodec is a git-only dep of Zipvoice (uv-only source, pip can't resolve it)
-linacodec @ git+https://github.com/ysharma3501/LinaCodec.git
-Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git
-
-# Chatterbox TTS sub-dependencies (chatterbox-tts itself is installed
-# --no-deps in the setup script because it pins numpy<1.26 / torch==2.6
-# which are incompatible with Python 3.12+)
-conformer>=0.3.2
-diffusers>=0.29.0
-omegaconf
-pykakasi
-resemble-perth>=1.0.1
-s3tokenizer
-spacy-pkuseg
-pyloudnorm
-
-# HumeAI TADA sub-dependencies (hume-tada itself is installed
-# --no-deps in the setup script because it pins torch>=2.7,<2.8.
-# descript-audio-codec is NOT installed — it pulls onnx/tensorboard
-# via descript-audiotools.  A lightweight shim in utils/dac_shim.py
-# provides the only class TADA uses: Snake1d.)
-torchaudio
-
-# Kokoro TTS (lightweight 82M-param engine)
-kokoro>=0.9.4
-misaki[en,ja,zh]>=0.9.4
-# spacy model for misaki English G2P — must be pre-installed or misaki
-# tries spacy.cli.download() at runtime which crashes frozen builds
-en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
-# fugashi (pulled in by misaki[ja]) needs a MeCab dictionary on disk.
-# unidic-lite ships one inside the wheel (~50MB); the full `unidic` package
-# requires `python -m unidic download` (~526MB) which breaks frozen builds
-# for the same reason en_core_web_sm does.
-unidic-lite>=1.0.8
+# Supertonic 3 TTS (CPU-only 99M-param ONNX engine, 31 languages, 10 preset voices)
+# No --no-deps needed: requires onnxruntime>=1.19/1.20, numpy>=1.21, soundfile,
+# huggingface-hub — all compatible with the stack above (incl. numpy<2.0).
+supertonic>=1.3.1
 
 # Audio processing
 audioop-lts>=0.2.1; python_version >= "3.13"

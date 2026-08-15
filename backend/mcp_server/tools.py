@@ -49,7 +49,7 @@ def register_tools(mcp: FastMCP) -> None:
         engine: str | None = None,
         personality: bool | None = None,
         language: str | None = None,
-        model_size: Literal["1.7B", "0.6B", "1B", "3B"] | None = None,
+        model_size: Literal["1.7B"] | None = None,
     ) -> dict[str, Any]:
         """Speak ``text`` in a voice profile.
 
@@ -64,10 +64,9 @@ def register_tools(mcp: FastMCP) -> None:
         default is plain TTS.
 
         ``model_size`` selects a model variant for engines that ship more
-        than one — ``qwen`` and ``qwen_custom_voice`` accept "1.7B" (default)
-        or "0.6B"; ``tada`` accepts "1B" or "3B". Other engines ignore it.
-        Omit to use the engine default. Requesting a smaller variant (e.g.
-        "0.6B") is faster and avoids reloading a heavier model between calls.
+        than one — ``qwen`` and ``qwen_custom_voice`` accept "1.7B" (default).
+        Other engines ignore it.
+        Omit to use the engine default.
         """
         from ..database.models import MCPClientBinding
 

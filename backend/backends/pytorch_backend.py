@@ -45,14 +45,13 @@ class PyTorchTTSBackend:
         Get the HuggingFace Hub model ID.
 
         Args:
-            model_size: Model size (1.7B or 0.6B)
+            model_size: Model size (1.7B)
 
         Returns:
             HuggingFace Hub model ID
         """
         hf_model_map = {
             "1.7B": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-            "0.6B": "Qwen/Qwen3-TTS-12Hz-0.6B-Base",
         }
 
         if model_size not in hf_model_map:
@@ -68,7 +67,7 @@ class PyTorchTTSBackend:
         Lazy load the TTS model with automatic downloading from HuggingFace Hub.
 
         Args:
-            model_size: Model size to load (1.7B or 0.6B)
+            model_size: Model size to load (1.7B)
         """
         if model_size is None:
             model_size = self.model_size
@@ -271,7 +270,7 @@ class PyTorchSTTBackend:
         Lazy load the Whisper model.
 
         Args:
-            model_size: Model size (tiny, base, small, medium, large)
+            model_size: Model size (large, turbo)
         """
         if model_size is None:
             model_size = self.model_size

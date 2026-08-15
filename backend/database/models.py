@@ -34,7 +34,7 @@ class VoiceProfile(Base):
 
     # Voice type system — added v0.3.x
     voice_type = Column(String, default="cloned")  # "cloned" | "preset" | "designed"
-    preset_engine = Column(String, nullable=True)   # e.g. "kokoro" — only for preset
+    preset_engine = Column(String, nullable=True)   # e.g. "supertonic" — only for preset
     preset_voice_id = Column(String, nullable=True)  # e.g. "am_adam" — only for preset
     design_prompt = Column(Text, nullable=True)      # text description — only for designed
     default_engine = Column(String, nullable=True)   # auto-selected engine, locked for preset
@@ -195,10 +195,10 @@ class CaptureSettings(Base):
     __tablename__ = "capture_settings"
 
     id = Column(Integer, primary_key=True, default=1)
-    stt_model = Column(String, nullable=False, default="turbo")
+    stt_model = Column(String, nullable=False, default="large")
     language = Column(String, nullable=False, default="auto")
     auto_refine = Column(Boolean, nullable=False, default=True)
-    llm_model = Column(String, nullable=False, default="0.6B")
+    llm_model = Column(String, nullable=False, default="1.7B")
     smart_cleanup = Column(Boolean, nullable=False, default=True)
     self_correction = Column(Boolean, nullable=False, default=True)
     preserve_technical = Column(Boolean, nullable=False, default=True)

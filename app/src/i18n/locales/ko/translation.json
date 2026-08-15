@@ -760,8 +760,13 @@
       }
     },
     "general": {
-      "docs": { "title": "문서 읽기" },
-      "discord": { "title": "Discord 참여하기", "subtitle": "도움말 & 음성 공유" },
+      "docs": {
+        "title": "문서 읽기"
+      },
+      "discord": {
+        "title": "Discord 참여하기",
+        "subtitle": "도움말 & 음성 공유"
+      },
       "serverUrl": {
         "title": "서버 URL",
         "description": "voicebox 백엔드 서버 주소입니다.",
@@ -921,13 +926,11 @@
           "small": "Whisper Small · 244M · {{tail}}",
           "medium": "Whisper Medium · 769M · {{tail}}",
           "large": "Whisper Large · 1.5B · {{tail}}",
-          "turbo": "Whisper Turbo · Pruned Large v3 · {{tail}}",
           "tail": {
             "fast": "빠름",
             "balanced": "균형",
             "higher": "높은 정확도",
-            "best": "최고 정확도",
-            "nearBest": "최고 수준, 빠름"
+            "best": "최고 정확도"
           }
         },
         "language": {
@@ -957,11 +960,9 @@
         "model": {
           "title": "정제 모델",
           "description": "더 큰 모델은 느리지만 미묘한 자기 수정과 기술 용어를 더 잘 처리합니다.",
-          "size06": "Qwen3 · 0.6B · 400 MB · {{tail}}",
           "size17": "Qwen3 · 1.7B · 1.1 GB · {{tail}}",
           "size40": "Qwen3 · 4B · 2.5 GB · {{tail}}",
           "tail": {
-            "veryFast": "매우 빠름",
             "fast": "빠름",
             "fullQuality": "최고 품질"
           }

@@ -70,15 +70,11 @@ export interface GenerationRequest {
   text: string;
   language: LanguageCode;
   seed?: number;
-  model_size?: '1.7B' | '0.6B' | '1B' | '3B';
+  model_size?: '1.7B';
   engine?:
     | 'qwen'
     | 'qwen_custom_voice'
-    | 'luxtts'
-    | 'chatterbox'
-    | 'chatterbox_turbo'
-    | 'tada'
-    | 'kokoro';
+    | 'supertonic';
   instruct?: string;
   /** When true and the profile has a personality prompt, input text is rewritten in-character before TTS. */
   personality?: boolean;
@@ -136,9 +132,9 @@ export interface HistoryListResponse {
   total: number;
 }
 
-export type WhisperModelSize = 'base' | 'small' | 'medium' | 'large' | 'turbo';
+export type WhisperModelSize = 'large';
 
-export type Qwen3ModelSize = '0.6B' | '1.7B' | '4B';
+export type Qwen3ModelSize = '1.7B';
 
 export type CaptureSource = 'dictation' | 'recording' | 'file';
 

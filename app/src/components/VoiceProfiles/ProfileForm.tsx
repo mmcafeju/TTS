@@ -61,15 +61,11 @@ import { AudioSampleUpload } from './AudioSampleUpload';
 import { SampleList } from './SampleList';
 
 const MAX_AUDIO_DURATION_SECONDS = 30;
-const PRESET_ONLY_ENGINES = new Set(['kokoro', 'qwen_custom_voice']);
+const PRESET_ONLY_ENGINES = new Set(['qwen_custom_voice', 'supertonic']);
 const DEFAULT_ENGINE_OPTIONS = [
   { value: 'qwen', label: 'Qwen3-TTS' },
   { value: 'qwen_custom_voice', label: 'Qwen CustomVoice' },
-  { value: 'luxtts', label: 'LuxTTS' },
-  { value: 'chatterbox', label: 'Chatterbox' },
-  { value: 'chatterbox_turbo', label: 'Chatterbox Turbo' },
-  { value: 'tada', label: 'TADA' },
-  { value: 'kokoro', label: 'Kokoro 82M' },
+  { value: 'supertonic', label: 'Supertonic 3' },
 ] as const;
 
 function makeProfileSchema(t: (key: string) => string) {
@@ -152,7 +148,7 @@ export function ProfileForm() {
   const [audioDuration, setAudioDuration] = useState<number | null>(null);
   const [isValidatingAudio, setIsValidatingAudio] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [selectedPresetEngine, setSelectedPresetEngine] = useState<string>('kokoro');
+  const [selectedPresetEngine, setSelectedPresetEngine] = useState<string>('qwen_custom_voice');
   const [selectedPresetVoiceId, setSelectedPresetVoiceId] = useState<string>('');
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const { isPlaying, playPause, cleanup: cleanupAudio } = useAudioPlayer();
@@ -896,8 +892,8 @@ export function ProfileForm() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="kokoro">Kokoro 82M</SelectItem>
                                 <SelectItem value="qwen_custom_voice">Qwen CustomVoice</SelectItem>
+                                <SelectItem value="supertonic">Supertonic 3</SelectItem>
                               </SelectContent>
                             </Select>
                           </FormItem>

@@ -51,7 +51,6 @@ QWEN_CV_DEFAULT_SPEAKER = "Ryan"
 # HuggingFace repo IDs per model size
 QWEN_CV_HF_REPOS = {
     "1.7B": "Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice",
-    "0.6B": "Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice",
 }
 
 

@@ -205,8 +205,8 @@ async def test_generation_with_fresh_download():
     print("Expected: Download progress events from 0% to 100%")
     print("=" * 80)
 
-    # Use a different model size to force download
-    model_size = "0.6B"  # Smaller model for faster testing
+    # Use the model size (already 1.7B for the qwen engine) to force download
+    model_size = "1.7B"  # Force model download for testing
     model_name = f"qwen-tts-{model_size}"
 
     # Get a profile

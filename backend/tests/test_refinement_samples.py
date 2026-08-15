@@ -408,13 +408,13 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--port", type=int, default=None,
                     help="Voicebox backend port (auto-detected if omitted)")
-    ap.add_argument("--model", choices=("0.6B", "1.7B", "4B"), action="append",
+    ap.add_argument("--model", choices=("1.7B", "4B"), action="append",
                     help="Refinement model size(s) to test (repeat to run several)")
     ap.add_argument("--json", type=Path, default=None,
                     help="Also write results as JSON to this path")
     args = ap.parse_args()
 
-    models = tuple(args.model) if args.model else ("0.6B", "4B")
+    models = tuple(args.model) if args.model else ("1.7B",)
     port = detect_backend_port(args.port)
     print(f"backend → http://127.0.0.1:{port}")
     print(f"samples → {len(SAMPLES)}, models → {models}")

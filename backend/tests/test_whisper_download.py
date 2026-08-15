@@ -88,8 +88,8 @@ async def main():
 
     print("✓ Server is running")
 
-    # Choose a small model for testing
-    model_name = "whisper-base"  # ~150MB, faster to download
+    # Choose a model for testing
+    model_name = "whisper-large"  # the supported Whisper variant
     print(f"\nUsing model: {model_name}")
 
     # Option to delete model first if it exists

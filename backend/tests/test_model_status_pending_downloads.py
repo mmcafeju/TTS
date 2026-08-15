@@ -13,15 +13,15 @@ from backend.utils.tasks import TaskManager
 
 def test_errored_download_is_not_pending():
     tm = TaskManager()
-    tm.start_download("whisper-turbo")
-    assert [t.model_name for t in tm.get_pending_downloads()] == ["whisper-turbo"]
+    tm.start_download("whisper-large")
+    assert [t.model_name for t in tm.get_pending_downloads()] == ["whisper-large"]
 
-    tm.error_download("whisper-turbo", "boom")
+    tm.error_download("whisper-large", "boom")
 
     assert tm.get_pending_downloads() == []
     # Still visible to /tasks/active for the error/retry UI.
     active = tm.get_active_downloads()
-    assert [t.model_name for t in active] == ["whisper-turbo"]
+    assert [t.model_name for t in active] == ["whisper-large"]
     assert active[0].status == "error"
     assert active[0].error == "boom"
 
@@ -36,16 +36,16 @@ def test_retry_after_error_is_pending_again():
 
 def test_completed_download_is_removed_everywhere():
     tm = TaskManager()
-    tm.start_download("whisper-turbo")
-    tm.complete_download("whisper-turbo")
+    tm.start_download("whisper-large")
+    tm.complete_download("whisper-large")
     assert tm.get_pending_downloads() == []
     assert tm.get_active_downloads() == []
 
 
 def test_cancel_dismisses_errored_download():
     tm = TaskManager()
-    tm.start_download("whisper-turbo")
-    tm.error_download("whisper-turbo", "boom")
-    assert tm.cancel_download("whisper-turbo") is True
+    tm.start_download("whisper-large")
+    tm.error_download("whisper-large", "boom")
+    assert tm.cancel_download("whisper-large") is True
     assert tm.get_active_downloads() == []
     assert tm.get_pending_downloads() == []

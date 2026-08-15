@@ -760,8 +760,13 @@
       }
     },
     "general": {
-      "docs": { "title": "Lire la documentation" },
-      "discord": { "title": "Rejoindre le Discord", "subtitle": "Obtenez de l'aide et partagez des voix" },
+      "docs": {
+        "title": "Lire la documentation"
+      },
+      "discord": {
+        "title": "Rejoindre le Discord",
+        "subtitle": "Obtenez de l'aide et partagez des voix"
+      },
       "serverUrl": {
         "title": "URL du serveur",
         "description": "L'adresse de votre serveur Voicebox.",
@@ -921,13 +926,11 @@
           "small": "Whisper Small · 244M · {{tail}}",
           "medium": "Whisper Medium · 769M · {{tail}}",
           "large": "Whisper Large · 1,5B · {{tail}}",
-          "turbo": "Whisper Turbo · Pruned Large v3 · {{tail}}",
           "tail": {
             "fast": "Rapide",
             "balanced": "Équilibré",
             "higher": "Meilleure précision",
-            "best": "Meilleure précision",
-            "nearBest": "Presque meilleur, rapide"
+            "best": "Meilleure précision"
           }
         },
         "language": {
@@ -957,11 +960,9 @@
         "model": {
           "title": "Modèle de correction",
           "description": "Les modèles plus grands sont plus lents mais gèrent mieux les auto-corrections subtiles et le vocabulaire technique.",
-          "size06": "Qwen3 · 0,6B · 400 Mo · {{tail}}",
           "size17": "Qwen3 · 1,7B · 1,1 Go · {{tail}}",
           "size40": "Qwen3 · 4B · 2,5 Go · {{tail}}",
           "tail": {
-            "veryFast": "Très rapide",
             "fast": "Rapide",
             "fullQuality": "Qualité optimale"
           }

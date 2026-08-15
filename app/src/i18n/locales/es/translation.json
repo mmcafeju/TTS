@@ -926,13 +926,11 @@
           "small": "Whisper Small · 244M · {{tail}}",
           "medium": "Whisper Medium · 769M · {{tail}}",
           "large": "Whisper Large · 1.5B · {{tail}}",
-          "turbo": "Whisper Turbo · Pruned Large v3 · {{tail}}",
           "tail": {
             "fast": "Rápido",
             "balanced": "Equilibrado",
             "higher": "Mayor precisión",
-            "best": "Mejor precisión",
-            "nearBest": "Casi la mejor, rápido"
+            "best": "Mejor precisión"
           }
         },
         "language": {
@@ -962,11 +960,9 @@
         "model": {
           "title": "Modelo de refinamiento",
           "description": "Los modelos más grandes son más lentos, pero manejan mejor las autocorrecciones sutiles y el vocabulario técnico.",
-          "size06": "Qwen3 · 0.6B · 400 MB · {{tail}}",
           "size17": "Qwen3 · 1.7B · 1.1 GB · {{tail}}",
           "size40": "Qwen3 · 4B · 2.5 GB · {{tail}}",
           "tail": {
-            "veryFast": "Muy rápido",
             "fast": "Rápido",
             "fullQuality": "Calidad completa"
           }
