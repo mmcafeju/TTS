@@ -53,6 +53,12 @@ import type {
   MCPClientBindingUpsert,
   CloudLoginStartResponse,
   CloudStatus,
+  VCConvertRequest,
+  VCJobResponse,
+  VCModelResponse,
+  VCStatus,
+  VCTrainRequest,
+  VCUploadResponse,
 } from './types';
 
 function formatErrorDetail(detail: unknown, fallback: string): string {
@@ -954,6 +960,71 @@ class ApiClient {
 
   async disconnectCloud(): Promise<CloudStatus> {
     return this.request<CloudStatus>('/cloud/disconnect', { method: 'POST' });
+  }
+
+  // ── Voice Conversion (RVC) ──────────────────────────────────────────
+
+  async getVCStatus(): Promise<VCStatus> {
+    return this.request<VCStatus>('/vc/status');
+  }
+
+  async uploadVC(file: File, purpose: 'dataset' | 'source'): Promise<VCUploadResponse> {
+    const url = `${this.getBaseUrl()}/vc/upload`;
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('purpose', purpose);
+
+    const response = await fetch(url, { method: 'POST', body: formData });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({
+        detail: response.statusText,
+      }));
+      throw new Error(formatErrorDetail(error.detail, `HTTP error! status: ${response.status}`));
+    }
+    return response.json();
+  }
+
+  async trainVC(data: VCTrainRequest): Promise<VCJobResponse> {
+    return this.request<VCJobResponse>('/vc/train', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async convertVC(data: VCConvertRequest): Promise<VCJobResponse> {
+    return this.request<VCJobResponse>('/vc/convert', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async listVCModels(): Promise<VCModelResponse[]> {
+    return this.request<VCModelResponse[]>('/vc/models');
+  }
+
+  async renameVCModel(modelId: string, name: string): Promise<VCModelResponse> {
+    return this.request<VCModelResponse>(`/vc/models/${modelId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ name }),
+    });
+  }
+
+  async deleteVCModel(modelId: string): Promise<{ deleted: boolean }> {
+    return this.request<{ deleted: boolean }>(`/vc/models/${modelId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getVCJob(jobId: string): Promise<VCJobResponse> {
+    return this.request<VCJobResponse>(`/vc/jobs/${jobId}`);
+  }
+
+  async listVCJobs(limit = 20): Promise<VCJobResponse[]> {
+    return this.request<VCJobResponse[]>(`/vc/jobs?limit=${limit}`);
+  }
+
+  getVCResultUrl(jobId: string): string {
+    return `${this.getBaseUrl()}/vc/results/${jobId}`;
   }
 }
 

@@ -556,3 +556,71 @@ export interface CloudStatus {
   connected_at: string | null;
   dashboard_url: string;
 }
+
+/* ─── Voice Conversion (RVC) ──────────────────────────────────────────── */
+
+export interface VCUploadResponse {
+  file_id: string;
+  filename: string;
+  path: string;
+  size: number;
+  duration: number | null;
+}
+
+export interface VCTrainRequest {
+  name: string;
+  file_ids: string[];
+  sample_rate?: number;
+  total_epochs?: number;
+  batch_size?: number;
+  f0_method?: 'rmvpe' | 'harvest';
+}
+
+export interface VCConvertRequest {
+  model_id: string;
+  file_id: string;
+  f0_method?: 'rmvpe' | 'harvest';
+  index_rate?: number;
+  pitch?: number;
+  protect?: number;
+}
+
+export interface VCModelResponse {
+  id: string;
+  name: string;
+  version: string;
+  sample_rate: number;
+  total_epochs: number | null;
+  dataset_seconds: number | null;
+  status: 'ready' | 'training' | 'failed';
+  error: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface VCJobResponse {
+  id: string;
+  kind: string;
+  status: string;
+  model_id: string | null;
+  stage: string | null;
+  progress: number;
+  message: string | null;
+  error: string | null;
+  result_path: string | null;
+  created_at: string | null;
+  finished_at: string | null;
+}
+
+export interface VCStatus {
+  available: boolean;
+  engine_ready: boolean;
+  reason?: string | null;
+  device_name?: string | null;
+  total_vram?: number | null;
+  free_vram?: number | null;
+  can_train: boolean;
+  can_convert: boolean;
+  busy: boolean;
+  running_job_id: string | null;
+}

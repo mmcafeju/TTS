@@ -22,6 +22,7 @@ import { SettingsLayout } from '@/components/ServerTab/ServerTab';
 import { Sidebar } from '@/components/Sidebar';
 import { StoriesTab } from '@/components/StoriesTab/StoriesTab';
 import { Toaster } from '@/components/ui/toaster';
+import { VCTab } from '@/components/VCTab/VCTab';
 import { VoicesTab } from '@/components/VoicesTab/VoicesTab';
 import { useGenerationProgress } from '@/lib/hooks/useGenerationProgress';
 import { useModelDownloadToast } from '@/lib/hooks/useModelDownloadToast';
@@ -134,6 +135,13 @@ const modelsRoute = createRoute({
   component: ModelsTab,
 });
 
+// Voice Conversion route
+const vcRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/vc',
+  component: VCTab,
+});
+
 // Settings layout route (parent for sub-tabs)
 const settingsRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -205,6 +213,7 @@ const routeTree = rootRoute.addChildren([
   storiesRoute,
   capturesRoute,
   voicesRoute,
+  vcRoute,
   effectsRoute,
   modelsRoute,
   settingsRoute.addChildren([
