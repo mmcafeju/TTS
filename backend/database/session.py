@@ -21,15 +21,30 @@ from .seed import backfill_generation_versions, seed_builtin_presets
 
 logger = logging.getLogger(__name__)
 
-# Initialized by init_db()
+# Initialized by init_db(). `SessionLocal` is a callable that resolves the
+# current sessionmaker at call time, so modules that import it early (before
+# init_db() runs) still get a working factory instead of a stale None.
+class _SessionFactory:
+    def __init__(self) -> None:
+        self._sessionmaker = None
+
+    def __call__(self, **kwargs):
+        if self._sessionmaker is None:
+            raise RuntimeError("Database not initialized; call init_db() first")
+        return self._sessionmaker(**kwargs)
+
+    def configure(self, sessionmaker) -> None:
+        self._sessionmaker = sessionmaker
+
+
 engine = None
-SessionLocal = None
+SessionLocal = _SessionFactory()
 _db_path = None
 
 
 def init_db() -> None:
     """Initialize the database engine, run migrations, create tables, and seed data."""
-    global engine, SessionLocal, _db_path
+    global engine, _db_path
 
     _db_path = config.get_db_path()
     _db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -39,7 +54,7 @@ def init_db() -> None:
         connect_args={"check_same_thread": False},
     )
 
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    SessionLocal.configure(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
     run_migrations(engine)
     Base.metadata.create_all(bind=engine)

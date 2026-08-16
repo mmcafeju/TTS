@@ -42,6 +42,15 @@ def _require_cuda() -> None:
     require_engine_ready()
 
 
+def _add_engine_bin_to_path(env: dict, engine_dir: Path) -> None:
+    """Prepend the engine's bundled bin/ (ffmpeg/ffprobe) to PATH in-place."""
+    bin_dir = engine_dir / "bin"
+    if not bin_dir.is_dir():
+        return
+    path = env.get("PATH", "")
+    env["PATH"] = str(bin_dir) + os.pathsep + path if path else str(bin_dir)
+
+
 def _preflight_assets(sample_rate: int = 40000) -> None:
     """Ensure the engine's pretrained assets exist before training."""
     sr_label = f"{sample_rate // 1000}k"
@@ -110,6 +119,9 @@ async def run_train_job(job_id: str, model_id: str, dataset_dir: Path, opts: dic
     env = os.environ.copy()
     env["CUDA_VISIBLE_DEVICES"] = "0"
     env["PYTHONUNBUFFERED"] = "1"
+    # ffmpeg/ffprobe are used by infer/audio.py; ship them next to the engine
+    # and put them on PATH so the subprocess can find them.
+    _add_engine_bin_to_path(env, engine_dir)
 
     # 1. Preprocess (slicing, resampling, denoising to 3s chunks)
     from .jobs import _run_vc_process
@@ -118,7 +130,7 @@ async def run_train_job(job_id: str, model_id: str, dataset_dir: Path, opts: dic
         job_id,
         [
             str(python),
-            str(engine_dir / "train" / "preprocess.py"),
+            "-m", "train.preprocess",
             str(dataset_dir),
             str(sample_rate),
             "1",  # n_p (processes)
@@ -141,7 +153,7 @@ async def run_train_job(job_id: str, model_id: str, dataset_dir: Path, opts: dic
         job_id,
         [
             str(python),
-            str(engine_dir / "train" / "dataset" / "extract_f0.py"),
+            "-m", "train.dataset.extract_f0",
             "cuda",
             "1",
             "0",
@@ -163,7 +175,7 @@ async def run_train_job(job_id: str, model_id: str, dataset_dir: Path, opts: dic
         job_id,
         [
             str(python),
-            str(engine_dir / "train" / "dataset" / "extract_hubert_feature.py"),
+            "-m", "train.dataset.extract_hubert_feature",
             "cuda",
             "1",
             "0",
@@ -190,7 +202,7 @@ async def run_train_job(job_id: str, model_id: str, dataset_dir: Path, opts: dic
         job_id,
         [
             str(python),
-            str(engine_dir / "train" / "train.py"),
+            "-m", "train.train",
             "-e", model_id,
             "-sr", sr_label,
             "-f0", "1",
@@ -220,7 +232,7 @@ async def run_train_job(job_id: str, model_id: str, dataset_dir: Path, opts: dic
         job_id,
         [
             str(python),
-            str(engine_dir / "train" / "train_index.py"),
+            "-m", "train.train_index",
             model_id,
             version,
             str(INDICES_DIR),
@@ -393,7 +405,7 @@ async def run_convert_job(
 
     args = [
         str(python),
-        str(engine_dir / "infer" / "cli.py"),
+        "-m", "infer.cli",
         "--model", str(pth_path),
         "--input", str(source_path),
         "--output", str(result_path),
@@ -412,6 +424,7 @@ async def run_convert_job(
     env = os.environ.copy()
     env["CUDA_VISIBLE_DEVICES"] = "0"
     env["PYTHONUNBUFFERED"] = "1"
+    _add_engine_bin_to_path(env, engine_dir)
 
     from .jobs import _run_vc_process
 
