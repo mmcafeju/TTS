@@ -17,6 +17,7 @@ Mode differences:
 from __future__ import annotations
 
 import asyncio
+import logging
 import traceback
 from typing import Literal, Optional
 
@@ -24,6 +25,8 @@ from .. import config
 from . import history, profiles
 from ..database import get_db
 from ..utils.tasks import get_task_manager
+
+logger = logging.getLogger(__name__)
 
 
 async def run_generation(
@@ -42,6 +45,7 @@ async def run_generation(
     max_chunk_chars: Optional[int] = None,
     crossfade_ms: Optional[int] = None,
     version_id: Optional[str] = None,
+    output_format: Optional[str] = None,
 ) -> None:
     """Execute TTS inference and persist the result.
 
@@ -108,6 +112,7 @@ async def run_generation(
                 effects_chain=effects_chain,
                 save_audio=save_audio,
                 db=bg_db,
+                output_format=output_format,
             )
         elif mode == "retry":
             final_path = _save_retry(
@@ -115,6 +120,7 @@ async def run_generation(
                 audio=audio,
                 sample_rate=sample_rate,
                 save_audio=save_audio,
+                output_format=output_format,
             )
         elif mode == "regenerate":
             final_path = _save_regenerate(
@@ -124,6 +130,7 @@ async def run_generation(
                 sample_rate=sample_rate,
                 save_audio=save_audio,
                 db=bg_db,
+                output_format=output_format,
             )
 
         await history.update_generation_status(
@@ -172,6 +179,45 @@ def _notify_speak_end(generation_id: str, *, status: str) -> None:
         pass
 
 
+def _export_default_version(
+    *,
+    generation_id: str,
+    db,
+    output_format: str,
+) -> Optional[str]:
+    """Re-encode the default version's audio to a delivery format.
+
+    Exports the file referenced by the generation's default version, repoints
+    the version (and the generation row) at the exported file, and removes the
+    superseded source WAV. For broadcast/CD the export happens in place (same
+    ``.wav`` path), so no path change is needed.
+
+    Returns:
+        The updated storage path, or ``None`` if there was nothing to export.
+    """
+    from . import versions as versions_mod
+    from ..utils.audio_export import export_audio_file, get_format_spec
+
+    default_version = versions_mod.get_default_version(generation_id, db)
+    if not default_version:
+        return None
+
+    src = config.resolve_storage_path(default_version.audio_path)
+    if src is None or not src.is_file():
+        return None
+
+    spec = get_format_spec(output_format)
+    exported = export_audio_file(src, output_format)
+    exported_storage = config.to_storage_path(exported)
+
+    if exported_storage != default_version.audio_path:
+        versions_mod.update_audio_path(default_version.id, exported_storage, db)
+        src.unlink(missing_ok=True)
+
+    logger.info("generation %s exported to %s", generation_id, output_format)
+    return exported_storage
+
+
 def _save_generate(
     *,
     generation_id: str,
@@ -180,6 +226,7 @@ def _save_generate(
     effects_chain: Optional[list],
     save_audio,
     db,
+    output_format: Optional[str] = None,
 ) -> str:
     """Save clean version and optionally an effects-processed version.
 
@@ -230,6 +277,13 @@ def _save_generate(
                 is_default=True,
             )
 
+    if output_format:
+        exported = _export_default_version(
+            generation_id=generation_id, db=db, output_format=output_format
+        )
+        if exported:
+            return exported
+
     return config.to_storage_path(final_audio_path)
 
 
@@ -239,13 +293,24 @@ def _save_retry(
     audio,
     sample_rate: int,
     save_audio,
+    output_format: Optional[str] = None,
 ) -> str:
     """Save retry output -- single file, no versions.
 
     Returns the audio path.
     """
+    from ..utils.audio_export import export_audio_file
+
     audio_path = config.get_generations_dir() / f"{generation_id}.wav"
     save_audio(audio, str(audio_path), sample_rate)
+
+    if output_format:
+        exported = export_audio_file(audio_path, output_format)
+        exported_storage = config.to_storage_path(exported)
+        if exported_storage != config.to_storage_path(audio_path):
+            audio_path.unlink(missing_ok=True)
+        return exported_storage
+
     return config.to_storage_path(audio_path)
 
 
@@ -331,6 +396,7 @@ def _save_regenerate(
     sample_rate: int,
     save_audio,
     db,
+    output_format: Optional[str] = None,
 ) -> str:
     """Save regeneration output as a new version with auto-label.
 
@@ -358,5 +424,12 @@ def _save_regenerate(
         effects_chain=None,
         is_default=True,
     )
+
+    if output_format:
+        exported = _export_default_version(
+            generation_id=generation_id, db=db, output_format=output_format
+        )
+        if exported:
+            return exported
 
     return config.to_storage_path(audio_path)

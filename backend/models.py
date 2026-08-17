@@ -101,6 +101,15 @@ class GenerationRequest(BaseModel):
     effects_chain: Optional[List["EffectConfig"]] = Field(
         None, description="Effects chain to apply after generation (overrides profile default)"
     )
+    output_format: Optional[str] = Field(
+        default=None,
+        pattern="^(broadcast|cd|mp3)$",
+        description=(
+            "Delivery format applied to the final audio before save. "
+            "None keeps the engine's native WAV. broadcast=48k/24-bit WAV -24 LUFS, "
+            "cd=44.1k/16-bit WAV, mp3=44.1k/192kbps CBR -14 LUFS."
+        ),
+    )
 
 
 class GenerationResponse(BaseModel):

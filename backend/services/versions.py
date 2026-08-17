@@ -119,6 +119,26 @@ def create_version(
     return _version_response(version)
 
 
+def update_audio_path(
+    version_id: str, audio_path: str, db: Session
+) -> Optional[GenerationVersionResponse]:
+    """Point a version at a new audio file, keeping generation.audio_path in sync."""
+    version = db.query(DBGenerationVersion).filter_by(id=version_id).first()
+    if not version:
+        return None
+    version.audio_path = audio_path
+    db.commit()
+    db.refresh(version)
+
+    if version.is_default:
+        gen = db.query(DBGeneration).filter_by(id=version.generation_id).first()
+        if gen:
+            gen.audio_path = audio_path
+            db.commit()
+
+    return _version_response(version)
+
+
 def set_default_version(version_id: str, db: Session) -> Optional[GenerationVersionResponse]:
     """Set a version as the default for its generation."""
     version = db.query(DBGenerationVersion).filter_by(id=version_id).first()
