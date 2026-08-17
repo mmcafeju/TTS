@@ -719,6 +719,27 @@
       "tooltipInactive": "캐릭터로 말하기",
       "ariaLabelActive": "캐릭터로 말하는 중",
       "ariaLabelInactive": "캐릭터로 말하기"
+    },
+    "outputFormat": {
+      "label": "출력 형식",
+      "helpIcon": "오디오 규격 도움말",
+      "options": {
+        "original": "원본 (기본)",
+        "broadcast": "방송용",
+        "cd": "CD용",
+        "mp3": "MP3"
+      },
+      "help": {
+        "title": "오디오 출력 형식",
+        "description": "생성한 오디오를 파일 저장 직전에 선택한 규격으로 변환합니다. 출력은 항상 듀얼 모노(양 채널 동일)이며, 방송용·MP3는 EBU R128 음량 기준으로 정규화됩니다.",
+        "colFormat": "형식",
+        "colSampleRate": "샘플레이트",
+        "colLoudness": "음량",
+        "colChannel": "채널",
+        "dualMono": "듀얼 모노",
+        "inputTitle": "입력 오디오 권장 규격",
+        "inputBody": "성우 녹음본(음성 프로필 샘플)은 44.1kHz / 16-bit PCM WAV(CD 규격) 이상을 권장합니다. 방송용 출력이 목표라면 48kHz / 24-bit PCM WAV(방송 규격) 입력이 이상적입니다."
+      }
     }
   },
   "main": {

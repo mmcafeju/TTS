@@ -30,6 +30,7 @@ interface UseGenerationFormOptions {
   onSuccess?: (generationId: string) => void;
   defaultValues?: Partial<GenerationFormValues>;
   getEffectsChain?: () => EffectConfig[] | undefined;
+  getOutputFormat?: () => 'original' | 'broadcast' | 'cd' | 'mp3' | undefined;
 }
 
 export function useGenerationForm(options: UseGenerationFormOptions = {}) {
@@ -111,6 +112,9 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
       // Base Qwen3-TTS accepts the kwarg but ignores it.
       const supportsInstruct = engine === 'qwen_custom_voice';
       const effectsChain = options.getEffectsChain?.();
+      const rawFormat = options.getOutputFormat?.();
+      const outputFormat =
+        rawFormat && rawFormat !== 'original' ? rawFormat : undefined;
       // This now returns immediately with status="generating"
       const result = await generation.mutateAsync({
         profile_id: selectedProfileId,
@@ -125,6 +129,7 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
         crossfade_ms: crossfadeMs,
         normalize: normalizeAudio,
         effects_chain: effectsChain?.length ? effectsChain : undefined,
+        output_format: outputFormat,
       });
 
       // Track this generation for SSE status updates

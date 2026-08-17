@@ -24,6 +24,7 @@ import { cn } from '@/lib/utils/cn';
 import { useGenerationStore } from '@/stores/generationStore';
 import { useStoryStore } from '@/stores/storyStore';
 import { useUIStore } from '@/stores/uiStore';
+import { AudioFormatHelpDialog } from './AudioFormatHelpDialog';
 import { EngineModelSelector } from './EngineModelSelector';
 
 interface FloatingGenerateBoxProps {
@@ -44,6 +45,7 @@ export function FloatingGenerateBox({
   const [isExpanded, setIsExpanded] = useState(false);
   const [isInstructExpanded, setIsInstructExpanded] = useState(false);
   const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
+  const [outputFormat, setOutputFormat] = useState<'original' | 'broadcast' | 'cd' | 'mp3'>('original');
   const containerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const matchRoute = useMatchRoute();
@@ -95,6 +97,7 @@ export function FloatingGenerateBox({
       const preset = effectPresets.find((p) => p.id === selectedPresetId);
       return preset?.effects_chain;
     },
+    getOutputFormat: () => outputFormat,
   });
 
   // Click away handler to collapse the box
@@ -516,6 +519,37 @@ export function FloatingGenerateBox({
                 className=" mt-3"
               >
                 <div className="flex items-center gap-2">
+                  <span className="whitespace-nowrap text-xs text-muted-foreground">
+                    {t('generation.outputFormat.label')}
+                  </span>
+                  <Select
+                    value={outputFormat}
+                    onValueChange={(value) =>
+                      setOutputFormat(value as typeof outputFormat)
+                    }
+                  >
+                    <SelectTrigger className="h-8 w-40 text-xs bg-card border-border rounded-full hover:bg-background/50 transition-all">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent side="top">
+                      <SelectItem value="original" className="text-xs">
+                        {t('generation.outputFormat.options.original')}
+                      </SelectItem>
+                      <SelectItem value="broadcast" className="text-xs">
+                        {t('generation.outputFormat.options.broadcast')}
+                      </SelectItem>
+                      <SelectItem value="cd" className="text-xs">
+                        {t('generation.outputFormat.options.cd')}
+                      </SelectItem>
+                      <SelectItem value="mp3" className="text-xs">
+                        {t('generation.outputFormat.options.mp3')}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <AudioFormatHelpDialog />
+                </div>
+
+                <div className="mt-2 flex items-center gap-2">
                   {showVoiceSelector && (
                     <div className="flex-1">
                       <Select

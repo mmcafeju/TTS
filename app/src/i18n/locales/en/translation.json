@@ -719,6 +719,27 @@
       "tooltipInactive": "Speak in character",
       "ariaLabelActive": "Speaking in character",
       "ariaLabelInactive": "Speak in character"
+    },
+    "outputFormat": {
+      "label": "Output format",
+      "helpIcon": "Audio spec help",
+      "options": {
+        "original": "Original",
+        "broadcast": "Broadcast",
+        "cd": "CD",
+        "mp3": "MP3"
+      },
+      "help": {
+        "title": "Audio output format",
+        "description": "The generated audio is converted to the selected spec right before saving. Output is always dual-mono (identical channels); broadcast and MP3 are loudness-normalized to EBU R128 targets.",
+        "colFormat": "Format",
+        "colSampleRate": "Sample rate",
+        "colLoudness": "Loudness",
+        "colChannel": "Channels",
+        "dualMono": "Dual mono",
+        "inputTitle": "Recommended input source",
+        "inputBody": "Voice-cloning samples should be at least 44.1 kHz / 16-bit PCM WAV (CD spec). For broadcast output, a 48 kHz / 24-bit PCM WAV (broadcast spec) input is ideal."
+      }
     }
   },
   "main": {

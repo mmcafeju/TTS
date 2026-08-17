@@ -82,6 +82,8 @@ export interface GenerationRequest {
   crossfade_ms?: number;
   normalize?: boolean;
   effects_chain?: EffectConfig[];
+  /** Delivery format applied before save. None keeps the engine's native WAV. */
+  output_format?: 'broadcast' | 'cd' | 'mp3';
 }
 
 export interface GenerationVersionResponse {
