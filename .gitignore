@@ -41,5 +41,10 @@ Thumbs.db
 # Data (user-generated)
 data/
 !data/.gitkeep
+# RVC engine runtime assets (downloaded by backend/scripts/download_rvc_assets.py,
+# not part of the source tree)
+backend/rvc_engine/assets/
+backend/rvc_engine/bin/
+backend/rvc_engine/logs/
 # Obsidian
 .obsidian/

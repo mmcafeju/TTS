@@ -4,9 +4,9 @@
 
 A single script, runnable on macOS and Windows, that exercises every TTS model against the **frozen PyInstaller binary** (not the dev server), captures per-model pass/fail and error messages, and exits non-zero if any model fails. Generation is strictly sequential — one model loaded at a time.
 
-## Test matrix (10 runs)
+## Test matrix (6 runs)
 
-Derived from `backend/backends/__init__.py:185-316`. Each row maps to one `POST /generate` call.
+Derived from `backend/backends/__init__.py`. Each row maps to one `POST /generate` call.
 
 | # | engine                | model_size | profile kind | notes |
 |---|-----------------------|------------|--------------|-------|
@@ -15,13 +15,9 @@ Derived from `backend/backends/__init__.py:185-316`. Each row maps to one `POST 
 | 3 | `qwen_custom_voice`   | `1.7B`     | preset       | `preset_voice_id="Ryan"` |
 | 4 | `qwen_custom_voice`   | `0.6B`     | preset       | `preset_voice_id="Ryan"` |
 | 5 | `luxtts`              | —          | cloned       | English only |
-| 6 | `chatterbox`          | —          | cloned       | |
-| 7 | `chatterbox_turbo`    | —          | cloned       | English only |
-| 8 | `tada`                | `1B`       | cloned       | tada-1b, English only |
-| 9 | `tada`                | `3B`       | cloned       | tada-3b-ml, multilingual |
-| 10| `kokoro`              | —          | preset       | `preset_voice_id="af_heart"` |
+| 6 | `supertonic`          | —          | preset       | `preset_voice_id="M1"` |
 
-Cloned engines (1, 2, 5, 6, 7, 8, 9) share **one** profile created once with the reference WAV. Preset profiles are created separately, one for kokoro and one for qwen_custom_voice.
+Cloned engines (1, 2, 5) share **one** profile created once with the reference WAV. Preset profiles are created separately, one for qwen_custom_voice and one for supertonic.
 
 Language for every run: `en` (covers every engine's supported set).
 
@@ -93,8 +89,8 @@ Two preset profiles:
 
 ```http
 POST /profiles
-{ "name": "e2e-kokoro",  "voice_type": "preset", "language": "en",
-  "preset_engine": "kokoro",            "preset_voice_id": "af_heart" }
+{ "name": "e2e-supertonic", "voice_type": "preset", "language": "en",
+  "preset_engine": "supertonic",         "preset_voice_id": "M1" }
 
 POST /profiles
 { "name": "e2e-qwen-cv", "voice_type": "preset", "language": "en",
@@ -125,7 +121,7 @@ Check `GET /models/status` for the target model **before** generation:
 | Cached? | Per-model timeout | Rationale |
 |---------|-------------------|-----------|
 | Yes     | **3 minutes**     | Inference only; generous for CPU builds |
-| No      | **20 minutes**    | First-run HF download up to 8 GB (tada-3b-ml) |
+| No      | **20 minutes**    | First-run HF download up to ~3.5 GB (qwen-tts-1.7B) |
 
 On timeout: cancel the SSE stream, mark the row `timeout`, and continue to the next row. Don't abort the whole run on one timeout.
 
@@ -178,7 +174,7 @@ python -m backend.tests.test_all_models_e2e [flags]
 --skip-build            Error if no binary found (no auto-build)
 --reference-wav PATH    Reference audio (default: backend/tests/fixtures/reference_voice.wav)
 --reference-text STR    Transcription (default: read from fixtures/reference_voice.txt)
---only ENGINE[,...]     Run only these engines (e.g. kokoro,qwen)
+--only ENGINE[,...]     Run only these engines (e.g. supertonic,qwen)
 --skip ENGINE[,...]     Skip these engines
 --keep-data-dir         Don't delete tempdir after run
 --timeout-cached SEC    Override 180

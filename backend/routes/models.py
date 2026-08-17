@@ -252,6 +252,7 @@ async def get_model_status():
             "display_name": cfg.display_name,
             "hf_repo_id": cfg.hf_repo_id,
             "model_size": cfg.model_size,
+            "engine": cfg.engine,
             "check_loaded": lambda c=cfg: check_model_loaded(c),
         }
         for cfg in registry_configs
@@ -339,6 +340,31 @@ async def get_model_status():
                                     size_mb = total_size / (1024 * 1024)
                                 except Exception:
                                     pass
+                except Exception:
+                    pass
+
+            if config["engine"] == "supertonic":
+                # Supertonic keeps its model in a Voicebox-managed dir
+                # (get_models_dir()/supertonic-3), not the HF cache, and uses
+                # .onnx weights, so the scan_cache_dir paths above never match.
+                try:
+                    from ..backends import get_tts_backend_for_engine
+
+                    backend = get_tts_backend_for_engine("supertonic")
+                    if backend._is_model_cached():
+                        downloaded = True
+                        try:
+                            model_dir = backend._get_model_dir()
+                            size_mb = (
+                                sum(
+                                    f.stat().st_size
+                                    for f in model_dir.rglob("*")
+                                    if f.is_file() and not f.name.endswith(".incomplete")
+                                )
+                                / (1024 * 1024)
+                            )
+                        except Exception:
+                            pass
                 except Exception:
                     pass
 
@@ -458,6 +484,23 @@ async def delete_model(model_name: str):
 
     try:
         unload_model_by_config(config)
+
+        if config.engine == "supertonic":
+            # Supertonic lives in a Voicebox-managed dir, not the HF cache.
+            from ..backends import get_tts_backend_for_engine
+
+            backend = get_tts_backend_for_engine("supertonic")
+            model_dir = backend._get_model_dir()
+
+            if not model_dir.exists():
+                raise HTTPException(status_code=404, detail=f"Model {model_name} not found in cache")
+
+            try:
+                shutil.rmtree(model_dir)
+            except OSError as e:
+                raise HTTPException(status_code=500, detail=f"Failed to delete model cache directory: {str(e)}")
+
+            return {"message": f"Model {model_name} deleted successfully"}
 
         cache_dir = hf_constants.HF_HUB_CACHE
         repo_cache_dir = Path(cache_dir) / ("models--" + hf_repo_id.replace("/", "--"))

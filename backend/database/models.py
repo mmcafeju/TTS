@@ -301,3 +301,65 @@ class Capture(Base):
     llm_model = Column(String, nullable=True)
     refinement_flags = Column(Text, nullable=True)  # JSON blob
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class VCModel(Base):
+    """An RVC voice-conversion model trained on the user's voice.
+
+    Trained via the RVC engine (backend/rvc_engine). The .pth weights and
+    optional .index file live under data/vc/models/<model_id>/. Stored paths
+    are normalized against the data dir like every other audio artifact.
+    """
+
+    __tablename__ = "vc_models"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    name = Column(String, unique=True, nullable=False)
+    pth_path = Column(String, nullable=False)
+    index_path = Column(String, nullable=True)
+    # RVC version (v1 | v2) baked into the trained checkpoint.
+    version = Column(String, nullable=False, default="v2")
+    # Sample rate the model was trained at (40k | 48k).
+    sample_rate = Column(Integer, nullable=False, default=40000)
+    # Training metadata reported by the RVC pipeline.
+    total_epochs = Column(Integer, nullable=True)
+    dataset_seconds = Column(Float, nullable=True)
+    # ready | training | failed | deleted
+    status = Column(String, nullable=False, default="ready")
+    error = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class VCJob(Base):
+    """A single voice-conversion job (training or inference).
+
+    RVC training/inference run in a separate subprocess against a dedicated
+    venv so a crash or OOM inside the RVC engine can never take down the
+    FastAPI process. Progress is tracked by parsing the RVC log files;
+    results are written under data/vc/{uploads,results}/.
+    """
+
+    __tablename__ = "vc_jobs"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    kind = Column(String, nullable=False)  # train | convert
+    status = Column(String, nullable=False, default="pending")  # pending | running | done | failed | cancelled
+    model_id = Column(String, ForeignKey("vc_models.id"), nullable=True)
+    # Human-readable stage reported to the UI (queued → preprocessing →
+    # feature extraction → training → indexing → done).
+    stage = Column(String, nullable=True)
+    progress = Column(Float, nullable=False, default=0.0)
+    message = Column(Text, nullable=True)
+    # Inputs for conversion jobs: source audio path + options.
+    source_path = Column(String, nullable=True)
+    f0_method = Column(String, nullable=True)
+    index_rate = Column(Float, nullable=True)
+    pitch = Column(Integer, nullable=True)
+    protect = Column(Float, nullable=True)
+    # Output artifact for convert jobs.
+    result_path = Column(String, nullable=True)
+    error = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    finished_at = Column(DateTime, nullable=True)

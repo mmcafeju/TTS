@@ -152,7 +152,7 @@ def patch_transformers_mistral_regex():
     which unconditionally calls ``huggingface_hub.model_info(repo_id)`` during
     every non-local tokenizer load to check whether the model is a Mistral
     variant. That call raises on ``HF_HUB_OFFLINE=1`` and on plain network
-    failures, killing unrelated loads (Qwen TTS, TADA, etc.).
+    failures, killing unrelated loads (Qwen TTS, etc.).
 
     Voicebox never loads Mistral models, so the rewrite the function would
     apply is a no-op for us anyway. Wrap the method so any exception from the

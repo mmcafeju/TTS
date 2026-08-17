@@ -294,6 +294,14 @@ async def _run_startup(application: FastAPI) -> None:
 
     init_queue()
 
+    # Initialize the voice-conversion (RVC) job queue.
+    try:
+        from .services.vc import init_vc_queue
+
+        init_vc_queue()
+    except Exception as e:
+        logger.warning("Could not initialize VC queue: %s", e)
+
     # Mark stale "generating" records as failed -- leftovers from a killed process
     from sqlalchemy import text as sa_text
 

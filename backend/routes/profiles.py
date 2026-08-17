@@ -74,21 +74,6 @@ async def import_profile(
 @router.get("/profiles/presets/{engine}")
 async def list_preset_voices(engine: str):
     """List available preset voices for an engine."""
-    if engine == "kokoro":
-        from ..backends.kokoro_backend import KOKORO_VOICES
-
-        return {
-            "engine": engine,
-            "voices": [
-                {
-                    "voice_id": vid,
-                    "name": name,
-                    "gender": gender,
-                    "language": lang,
-                }
-                for vid, name, gender, lang in KOKORO_VOICES
-            ],
-        }
     if engine == "qwen_custom_voice":
         from ..backends.qwen_custom_voice_backend import QWEN_CUSTOM_VOICES
 
@@ -102,6 +87,21 @@ async def list_preset_voices(engine: str):
                     "language": lang,
                 }
                 for speaker_id, display_name, gender, lang, _desc in QWEN_CUSTOM_VOICES
+            ],
+        }
+    if engine == "supertonic":
+        from ..backends.supertonic_backend import SUPERTONIC_VOICES
+
+        return {
+            "engine": engine,
+            "voices": [
+                {
+                    "voice_id": vid,
+                    "name": name,
+                    "gender": gender,
+                    "language": lang,
+                }
+                for vid, name, gender, lang in SUPERTONIC_VOICES
             ],
         }
     return {"engine": engine, "voices": []}

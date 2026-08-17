@@ -816,3 +816,69 @@ class CloudStatusResponse(BaseModel):
     key_prefix: Optional[str] = None
     connected_at: Optional[datetime] = None
     dashboard_url: str
+
+
+# ——— Voice Conversion (RVC) ———
+
+
+class VCUploadResponse(BaseModel):
+    """Response to an uploaded dataset / source audio file."""
+
+    file_id: str
+    filename: str
+    path: str
+    size: int
+    duration: Optional[float] = None
+
+
+class VCTrainRequest(BaseModel):
+    """Request to train a new RVC voice model."""
+
+    name: str = Field(..., min_length=1, max_length=100)
+    file_ids: List[str] = Field(..., min_length=1)
+    sample_rate: int = Field(40000, ge=32000, le=48000)
+    total_epochs: int = Field(100, ge=1, le=1000)
+    batch_size: int = Field(4, ge=1, le=4)
+    f0_method: str = Field("rmvpe", pattern="^(rmvpe|harvest)$")
+
+
+class VCConvertRequest(BaseModel):
+    """Request to convert a source voice through a trained model."""
+
+    model_id: str
+    file_id: str
+    f0_method: str = Field("rmvpe", pattern="^(rmvpe|harvest)$")
+    index_rate: float = Field(0.75, ge=0.0, le=1.0)
+    pitch: int = Field(0, ge=-24, le=24)
+    protect: float = Field(0.33, ge=0.0, le=0.5)
+
+
+class VCModelResponse(BaseModel):
+    """A trained RVC voice model."""
+
+    id: str
+    name: str
+    version: str = "v2"
+    sample_rate: int = 40000
+    total_epochs: Optional[int] = None
+    dataset_seconds: Optional[float] = None
+    status: str = "ready"
+    error: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+class VCJobResponse(BaseModel):
+    """A voice-conversion job (training or conversion)."""
+
+    id: str
+    kind: str
+    status: str
+    model_id: Optional[str] = None
+    stage: Optional[str] = None
+    progress: float = 0.0
+    message: Optional[str] = None
+    error: Optional[str] = None
+    result_path: Optional[str] = None
+    created_at: Optional[datetime] = None
+    finished_at: Optional[datetime] = None

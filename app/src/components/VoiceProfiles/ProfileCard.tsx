@@ -20,8 +20,8 @@ import { useUIStore } from '@/stores/uiStore';
 
 /** Human-readable display names for preset engine badges. */
 const ENGINE_DISPLAY_NAMES: Record<string, string> = {
-  kokoro: 'Kokoro',
   qwen_custom_voice: 'CustomVoice',
+  supertonic: 'Supertonic',
 };
 
 interface ProfileCardProps {

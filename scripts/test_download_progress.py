@@ -6,13 +6,11 @@ for each TTS model. Doesn't load models — just downloads and tracks tqdm.
 Usage:
     backend/venv/bin/python scripts/test_download_progress.py qwen
     backend/venv/bin/python scripts/test_download_progress.py luxtts
-    backend/venv/bin/python scripts/test_download_progress.py chatterbox
 
 Add --delete to clear cache first and force a real download:
-    backend/venv/bin/python scripts/test_download_progress.py chatterbox --delete
+    backend/venv/bin/python scripts/test_download_progress.py luxtts --delete
 """
 
-import os
 import shutil
 import sys
 import time
@@ -32,19 +30,6 @@ MODELS = {
         "repo_id": "YatharthS/LuxTTS",
         "method": "snapshot_download",
         "description": "LuxTTS (uses snapshot_download)",
-    },
-    "chatterbox": {
-        "repo_id": "ResembleAI/chatterbox",
-        "method": "snapshot_download",
-        "allow_patterns": [
-            "ve.pt",
-            "t3_mtl23ls_v2.safetensors",
-            "s3gen.pt",
-            "grapheme_mtl_merged_expanded_v1.json",
-            "conds.pt",
-            "Cangjie5_TC.json",
-        ],
-        "description": "Chatterbox Multilingual (uses snapshot_download with allow_patterns)",
     },
 }
 
@@ -325,22 +310,6 @@ def download_luxtts(spy: ProgressSpy):
         snapshot_download(repo_id)
 
 
-def download_chatterbox(spy: ProgressSpy):
-    """Mirrors how chatterbox_backend.py downloads Chatterbox."""
-    from huggingface_hub import snapshot_download
-    cfg = MODELS["chatterbox"]
-
-    print(f"Downloading {cfg['repo_id']} via snapshot_download with allow_patterns...")
-    with spy.patch():
-        snapshot_download(
-            repo_id=cfg["repo_id"],
-            repo_type="model",
-            revision="main",
-            allow_patterns=cfg["allow_patterns"],
-            token=os.getenv("HF_TOKEN"),
-        )
-
-
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
@@ -367,7 +336,6 @@ def main():
     dispatch = {
         "qwen": download_qwen,
         "luxtts": download_luxtts,
-        "chatterbox": download_chatterbox,
     }
 
     try:

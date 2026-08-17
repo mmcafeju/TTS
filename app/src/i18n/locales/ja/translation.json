@@ -1242,7 +1242,7 @@
   },
   "vc": {
     "title": "Voice Conversion",
-    "engineReady": "Engine ready · {device}",
+    "engineReady": "Engine ready · {{device}}",
     "engineNotReady": "Engine not ready",
     "train": {
       "title": "Train model",
@@ -1250,7 +1250,7 @@
       "modelNamePlaceholder": "e.g. My custom voice",
       "dataset": "Dataset audio",
       "selectFiles": "Click to select dataset files (wav/mp3)",
-      "filesSelected": "{count} file(s) selected",
+      "filesSelected": "{{count}} file(s) selected",
       "sampleRate": "Sample rate",
       "f0Method": "F0 method",
       "epochs": "Epochs",
@@ -1264,13 +1264,13 @@
       "selectModel": "Select a model",
       "source": "Source audio",
       "selectFiles": "Click to select source audio",
-      "filesSelected": "{count} file(s) selected",
+      "filesSelected": "{{count}} file(s) selected",
       "f0Method": "F0 method",
       "indexRate": "Index rate",
       "pitch": "Pitch shift",
       "start": "Convert",
       "noVram": "Not enough free VRAM to convert.",
-      "jobProgress": "{stage} · {pct}%",
+      "jobProgress": "{{stage}} · {{pct}}%",
       "listenResult": "Listen to result"
     },
     "models": {

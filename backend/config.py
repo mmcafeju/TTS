@@ -6,6 +6,7 @@ Handles data directory configuration for production bundling.
 
 import logging
 import os
+import sys
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -148,6 +149,72 @@ def get_models_dir() -> Path:
     path = _data_dir / "models"
     path.mkdir(parents=True, exist_ok=True)
     return path
+
+
+def get_vc_dir() -> Path:
+    """Get the voice-conversion (RVC) root directory path."""
+    path = _data_dir / "vc"
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def get_vc_uploads_dir() -> Path:
+    """Get the voice-conversion upload (dataset/source audio) directory."""
+    path = get_vc_dir() / "uploads"
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def get_vc_models_dir() -> Path:
+    """Get the directory holding trained RVC .pth models (one subdir per model)."""
+    path = get_vc_dir() / "models"
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def get_vc_results_dir() -> Path:
+    """Get the directory holding voice-conversion result audio."""
+    path = get_vc_dir() / "results"
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def get_rvc_engine_dir() -> Path:
+    """Locate the vendored RVC engine directory.
+
+    The RVC engine (backend/rvc_engine) is *not* bundled into the PyInstaller
+    binary: it carries its own venv + torch and runs as a separate subprocess,
+    so it ships as a standalone directory at runtime. Resolution order:
+
+      1. ``VOICEBOX_RVC_DIR`` env var — explicit absolute path to the engine
+         root (set by the launcher / user; must be set before server import
+         because pipeline.py caches engine-relative paths at module load).
+      2. Frozen (PyInstaller): ``rvc_engine`` placed next to the
+         ``voicebox-server`` executable (portable layout). Works for both
+         ``--onedir`` (dist/<name>/rvc_engine) and ``--onefile`` builds.
+      3. Bundled into the PyInstaller archive (``sys._MEIPASS``) — kept as a
+         fallback for a future slim engine build that is bundled.
+      4. Source checkout: ``backend/rvc_engine`` (development).
+    """
+    override = os.environ.get("VOICEBOX_RVC_DIR")
+    if override:
+        return Path(override).resolve()
+
+    if getattr(sys, "frozen", False):
+        # Portable layout: engine directory lives beside the server binary.
+        exe_dir = Path(sys.executable).resolve().parent
+        sibling = exe_dir / "rvc_engine"
+        if sibling.is_dir():
+            return sibling
+        # Fallback: engine was bundled into the one-dir/_MEIPASS payload.
+        meipass = getattr(sys, "_MEIPASS", None)
+        if meipass:
+            bundled = Path(meipass) / "rvc_engine"
+            if bundled.is_dir():
+                return bundled
+        return sibling
+
+    return Path(__file__).resolve().parent / "rvc_engine"
 
 
 # Voicebox Cloud (backup & sync). Two hosts: the web app owns auth + device

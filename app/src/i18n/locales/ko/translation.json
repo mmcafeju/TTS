@@ -1270,7 +1270,7 @@
   },
   "vc": {
     "title": "음성 변환",
-    "engineReady": "엔진 준비됨 · {device}",
+    "engineReady": "엔진 준비됨 · {{device}}",
     "engineNotReady": "엔진 준비 안 됨",
     "train": {
       "title": "모델 훈련",
@@ -1278,7 +1278,7 @@
       "modelNamePlaceholder": "예: 나만의 목소리",
       "dataset": "데이터셋 오디오",
       "selectFiles": "데이터셋 파일 선택 (wav/mp3)",
-      "filesSelected": "{count}개 파일 선택됨",
+      "filesSelected": "{{count}}개 파일 선택됨",
       "sampleRate": "샘플레이트",
       "f0Method": "F0 방식",
       "epochs": "에폭",
@@ -1292,13 +1292,13 @@
       "selectModel": "모델 선택",
       "source": "원본 오디오",
       "selectFiles": "원본 오디오 선택",
-      "filesSelected": "{count}개 파일 선택됨",
+      "filesSelected": "{{count}}개 파일 선택됨",
       "f0Method": "F0 방식",
       "indexRate": "인덱스 비율",
       "pitch": "피치 변환",
       "start": "변환",
       "noVram": "변환에 필요한 VRAM이 부족합니다.",
-      "jobProgress": "{stage} · {pct}%",
+      "jobProgress": "{{stage}} · {{pct}}%",
       "listenResult": "결과 듣기"
     },
     "models": {
