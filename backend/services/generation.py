@@ -95,7 +95,16 @@ async def run_generation(
         if crossfade_ms is not None:
             gen_kwargs["crossfade_ms"] = crossfade_ms
 
-        audio, sample_rate = await generate_chunked(tts_model, text, voice_prompt, **gen_kwargs)
+        collect_chunks = mode in ("generate", "regenerate")
+        if collect_chunks:
+            audio, sample_rate, chunk_meta = await generate_chunked(
+                tts_model, text, voice_prompt, collect_chunks=True, **gen_kwargs
+            )
+        else:
+            audio, sample_rate = await generate_chunked(
+                tts_model, text, voice_prompt, **gen_kwargs
+            )
+            chunk_meta = None
 
         # --- Normalize (generate and regenerate always; retry skips) -----
         if normalize or mode == "regenerate":
@@ -132,6 +141,11 @@ async def run_generation(
                 db=bg_db,
                 output_format=output_format,
             )
+
+        if chunk_meta:
+            from ..services.chunks import save_chunk_meta
+
+            save_chunk_meta(bg_db, generation_id, chunk_meta)
 
         await history.update_generation_status(
             generation_id=generation_id,

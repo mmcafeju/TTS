@@ -82,6 +82,11 @@ class Generation(Base):
     # profile's personality LLM before TTS. Future sources (bulk import,
     # agent replies, etc.) can extend this.
     source = Column(String, nullable=False, default="manual")
+    # JSON array of per-chunk metadata [{index, text, start_ms, end_ms,
+    # duration_ms}] captured at generation time. Used by the segment-level
+    # "regenerate this section" editor. Null/empty for single-shot short text
+    # or legacy rows.
+    chunk_meta = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 

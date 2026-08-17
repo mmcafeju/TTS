@@ -112,6 +112,16 @@ class GenerationRequest(BaseModel):
     )
 
 
+class ChunkMeta(BaseModel):
+    """Per-sentence chunk placement metadata for the segment editor."""
+
+    index: int
+    text: str
+    start_ms: int
+    end_ms: int
+    duration_ms: int
+
+
 class GenerationResponse(BaseModel):
     """Response model for voice generation."""
 
@@ -132,9 +142,24 @@ class GenerationResponse(BaseModel):
     created_at: datetime
     versions: Optional[List["GenerationVersionResponse"]] = None
     active_version_id: Optional[str] = None
+    chunks: Optional[List[ChunkMeta]] = None
 
     class Config:
         from_attributes = True
+
+
+class ChunkRegenerateRequest(BaseModel):
+    """Request to regenerate a single sentence chunk and splice it back in."""
+
+    text_override: Optional[str] = Field(
+        None, max_length=5000, description="Optional replacement text for the chunk"
+    )
+    seed: Optional[int] = Field(
+        None, ge=0, description="Optional seed for reproducible output (default: fresh take)"
+    )
+    crossfade_ms: int = Field(
+        default=50, ge=0, le=500, description="Splice crossfade in ms at the chunk boundaries"
+    )
 
 
 class HistoryQuery(BaseModel):
@@ -166,6 +191,7 @@ class HistoryResponse(BaseModel):
     created_at: datetime
     versions: Optional[List["GenerationVersionResponse"]] = None
     active_version_id: Optional[str] = None
+    chunks: Optional[List[ChunkMeta]] = None
 
     class Config:
         from_attributes = True

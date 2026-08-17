@@ -10,7 +10,8 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from .. import config, models
-from ..services import history, personality, profiles, tts
+from ..services import history
+from ..services.history import build_generation_response, personality, profiles, tts
 from ..database import Generation as DBGeneration, VoiceProfile as DBVoiceProfile, get_db
 from ..services.generation import run_generation
 from ..services.task_queue import cancel_generation as cancel_generation_job, enqueue_generation
@@ -185,7 +186,7 @@ async def retry_generation(generation_id: str, db: Session = Depends(get_db)):
         )
     )
 
-    return models.GenerationResponse.model_validate(gen)
+    return build_generation_response(gen)
 
 
 @router.post(
@@ -230,10 +231,63 @@ async def regenerate_generation(generation_id: str, db: Session = Depends(get_db
         )
     )
 
-    return models.GenerationResponse.model_validate(gen)
+    return build_generation_response(gen)
 
 
-@router.post("/generate/{generation_id}/cancel")
+@router.post(
+    "/generate/{generation_id}/chunks/{chunk_index}/regenerate",
+    response_model=models.GenerationResponse,
+)
+async def regenerate_chunk(
+    generation_id: str,
+    chunk_index: int,
+    data: models.ChunkRegenerateRequest,
+    db: Session = Depends(get_db),
+):
+    """Regenerate a single sentence chunk and splice it back in as a new version.
+
+    Body may override the chunk's text (for typo/pronunciation fixes) and
+    provide a seed or crossfade duration.
+    """
+    from ..services.chunks import parse_chunk_meta, regenerate_chunk as regenerate_chunk_job
+    from ..services.task_queue import enqueue_generation
+
+    gen = db.query(DBGeneration).filter_by(id=generation_id).first()
+    if not gen:
+        raise HTTPException(status_code=404, detail="Generation not found")
+    if (gen.status or "completed") != "completed":
+        raise HTTPException(status_code=400, detail="Generation must be completed to regenerate a chunk")
+
+    chunk_meta = parse_chunk_meta(gen)
+    if not chunk_meta:
+        raise HTTPException(status_code=400, detail="Generation has no chunk metadata to edit")
+    if not (0 <= chunk_index < len(chunk_meta)):
+        raise HTTPException(status_code=400, detail=f"Chunk index {chunk_index} out of range (0..{len(chunk_meta) - 1})")
+
+    gen.status = "generating"
+    gen.error = None
+    db.commit()
+    db.refresh(gen)
+
+    task_manager = get_task_manager()
+    task_manager.start_generation(
+        task_id=generation_id,
+        profile_id=gen.profile_id,
+        text=chunk_meta[chunk_index]["text"],
+    )
+
+    enqueue_generation(
+        generation_id,
+        regenerate_chunk_job(
+            generation_id=generation_id,
+            chunk_index=chunk_index,
+            text_override=data.text_override,
+            seed=data.seed,
+            crossfade_ms=data.crossfade_ms,
+        ),
+    )
+
+    return build_generation_response(gen)
 async def cancel_generation(generation_id: str, db: Session = Depends(get_db)):
     """Cancel a queued or running generation."""
     gen = db.query(DBGeneration).filter_by(id=generation_id).first()

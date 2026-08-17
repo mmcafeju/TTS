@@ -6,13 +6,37 @@ from typing import List, Optional, Tuple
 from datetime import datetime
 import uuid
 import shutil
+import json
 from pathlib import Path
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 
-from ..models import GenerationRequest, GenerationResponse, HistoryQuery, HistoryResponse, HistoryListResponse, GenerationVersionResponse, EffectConfig
+from ..models import GenerationRequest, GenerationResponse, HistoryQuery, HistoryResponse, HistoryListResponse, GenerationVersionResponse, EffectConfig, ChunkMeta
 from ..database import Generation as DBGeneration, GenerationVersion as DBGenerationVersion, VoiceProfile as DBVoiceProfile
 from .. import config
+
+
+def build_generation_response(gen) -> GenerationResponse:
+    """Serialize a generation row, attaching parsed chunk metadata."""
+    response = GenerationResponse.model_validate(gen)
+    if getattr(gen, "chunk_meta", None):
+        try:
+            raw = json.loads(gen.chunk_meta)
+            if isinstance(raw, list):
+                response.chunks = [
+                    ChunkMeta(
+                        index=int(c.get("index", i)),
+                        text=str(c.get("text", "")),
+                        start_ms=int(c.get("start_ms", 0)),
+                        end_ms=int(c.get("end_ms", 0)),
+                        duration_ms=int(c.get("duration_ms", 0)),
+                    )
+                    for i, c in enumerate(raw)
+                    if isinstance(c, dict)
+                ]
+        except (ValueError, TypeError):
+            response.chunks = None
+    return response
 
 
 def _get_versions_for_generation(generation_id: str, db: Session) -> tuple:
@@ -111,7 +135,7 @@ async def create_generation(
     db.commit()
     db.refresh(db_generation)
 
-    return GenerationResponse.model_validate(db_generation)
+    return build_generation_response(db_generation)
 
 
 async def update_generation_status(
@@ -137,7 +161,7 @@ async def update_generation_status(
 
     db.commit()
     db.refresh(generation)
-    return GenerationResponse.model_validate(generation)
+    return build_generation_response(generation)
 
 
 async def get_generation(
@@ -158,7 +182,7 @@ async def get_generation(
     if not generation:
         return None
     
-    return GenerationResponse.model_validate(generation)
+    return build_generation_response(generation)
 
 
 async def list_generations(
@@ -227,6 +251,7 @@ async def list_generations(
             created_at=generation.created_at,
             versions=versions,
             active_version_id=active_version_id,
+            chunks=build_generation_response(generation).chunks,
         ))
     
     return HistoryListResponse(

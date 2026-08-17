@@ -43,6 +43,7 @@ def run_migrations(engine) -> None:
     _migrate_generation_versions(engine, inspector, tables)
     _migrate_capture_settings(engine, inspector, tables)
     _migrate_mcp_bindings(engine, inspector, tables)
+    _migrate_generation_chunk_meta(engine, inspector, tables)
     _normalize_storage_paths(engine, tables)
 
 
@@ -281,6 +282,15 @@ def _migrate_mcp_bindings(engine, inspector, tables: set[str]) -> None:
                 "SQLite %s too old to DROP COLUMN (need 3.35+); leaving unused default_intent column on mcp_client_bindings in place.",
                 sqlite3.sqlite_version,
             )
+
+
+def _migrate_generation_chunk_meta(engine, inspector, tables: set[str]) -> None:
+    """Add the JSON ``chunk_meta`` column used by the segment editor."""
+    if "generations" not in tables:
+        return
+    columns = _get_columns(inspector, "generations")
+    if "chunk_meta" not in columns:
+        _add_column(engine, "generations", "chunk_meta TEXT", "chunk_meta")
 
 
 def _supports_drop_column(engine) -> bool:

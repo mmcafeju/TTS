@@ -203,6 +203,69 @@ def concatenate_audio_chunks(
     return result
 
 
+def compute_chunk_boundaries(
+    audio_chunks: List[np.ndarray],
+    sample_rate: int,
+    crossfade_ms: int = 50,
+) -> List[Tuple[int, int]]:
+    """Return ``(start_sample, end_sample)`` placement of each chunk in the
+    concatenated output, mirroring :func:`concatenate_audio_chunks` exactly.
+
+    Chunk 0 occupies ``[0, len)``; each later chunk's effective start is
+    ``accumulated_len - overlap`` because the crossfade blends ``overlap``
+    samples of its head into the previous chunk's tail.
+    """
+    if not audio_chunks:
+        return []
+    crossfade_samples = int(sample_rate * crossfade_ms / 1000)
+    acc_len = 0
+    out: List[Tuple[int, int]] = []
+    for i, chunk in enumerate(audio_chunks):
+        if len(chunk) == 0:
+            continue
+        if i == 0:
+            start = 0
+            overlap = 0
+        else:
+            overlap = min(crossfade_samples, acc_len, len(chunk))
+            start = acc_len - overlap
+        end = start + len(chunk)
+        out.append((start, end))
+        acc_len = acc_len - overlap + len(chunk)
+    return out
+
+
+def chunk_meta_from_audio(
+    chunk_texts: List[str],
+    audio_chunks: List[np.ndarray],
+    sample_rate: int,
+    crossfade_ms: int = 50,
+) -> List[dict]:
+    """Build the chunk metadata list for the segment editor.
+
+    Returns a list of ``{index, text, start_ms, end_ms, duration_ms}`` dicts.
+    Empty audio chunks are skipped so indices align with ``chunk_texts``.
+    """
+    boundaries = compute_chunk_boundaries(audio_chunks, sample_rate, crossfade_ms)
+    meta: List[dict] = []
+    audio_idx = 0
+    for text in chunk_texts:
+        if audio_idx >= len(boundaries):
+            break
+        start_sample, end_sample = boundaries[audio_idx]
+        meta.append(
+            {
+                "index": len(meta),
+                "text": text,
+                "start_ms": int(round(start_sample * 1000 / sample_rate)),
+                "end_ms": int(round(end_sample * 1000 / sample_rate)),
+                "duration_ms": int(round((end_sample - start_sample) * 1000 / sample_rate)),
+            }
+        )
+        audio_idx += 1
+    return meta
+
+
 async def generate_chunked(
     backend,
     text: str,
@@ -214,6 +277,7 @@ async def generate_chunked(
     crossfade_ms: int = 50,
     trim_fn=None,
     runaway_detector=None,
+    collect_chunks: bool = False,
 ) -> Tuple[np.ndarray, int]:
     """Generate audio with automatic chunking for long text.
 
@@ -245,10 +309,17 @@ async def generate_chunked(
     runaway_detector : callable | None
         Optional ``(audio, sample_rate) -> bool`` detector. When it flags
         unstable output, the affected text is split in half and retried.
+    collect_chunks : bool
+        When True, returns ``(audio, sample_rate, chunk_meta)`` where
+        ``chunk_meta`` is a list of ``{index, text, start_ms, end_ms,
+        duration_ms}`` dicts used by the segment editor. Default False
+        keeps the two-value return for existing callers.
 
     Returns
     -------
     (audio, sample_rate) : Tuple[np.ndarray, int]
+        Or a three-tuple including ``chunk_meta`` when *collect_chunks* is
+        True.
     """
     async def generate_one(
         chunk_text: str,
@@ -310,7 +381,22 @@ async def generate_chunked(
 
     if len(chunks) <= 1:
         # Short text — single-shot fast path
-        return await generate_one(text, seed)
+        audio, sample_rate = await generate_one(text, seed)
+        if collect_chunks:
+            return (
+                audio,
+                sample_rate,
+                [
+                    {
+                        "index": 0,
+                        "text": text,
+                        "start_ms": 0,
+                        "end_ms": int(round(len(audio) * 1000 / sample_rate)),
+                        "duration_ms": int(round(len(audio) * 1000 / sample_rate)),
+                    }
+                ],
+            )
+        return audio, sample_rate
 
     # Long text — chunked generation
     logger.info(
@@ -344,4 +430,10 @@ async def generate_chunked(
             sample_rate = chunk_sr
 
     audio = concatenate_audio_chunks(audio_chunks, sample_rate, crossfade_ms=crossfade_ms)
+    if collect_chunks:
+        return (
+            audio,
+            sample_rate,
+            chunk_meta_from_audio(chunks, audio_chunks, sample_rate, crossfade_ms),
+        )
     return audio, sample_rate
