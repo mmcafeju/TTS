@@ -43,6 +43,7 @@ export function HelpTab() {
           description={t(helpOverview.descriptionKey)}
           Icon={helpOverview.icon}
           specsKey={helpOverview.specsKey}
+          featuresKey={helpOverview.featuresKey}
         />
       );
     }
@@ -185,24 +186,53 @@ function PanelHeader({ title, subtitle, Icon }: PanelHeaderProps) {
   );
 }
 
+interface HelpOverviewFeature {
+  title: string;
+  body: string;
+}
+
 function OverviewPanel({
   title,
   description,
   Icon,
   specsKey,
+  featuresKey,
 }: {
   title: string;
   description: string;
   Icon: React.ComponentType<{ className?: string }>;
   specsKey: string;
+  featuresKey: string;
 }) {
   const { t } = useTranslation();
+  const features = t(featuresKey, {
+    returnObjects: true,
+  }) as HelpOverviewFeature[];
+
   return (
     <>
       <PanelHeader title={title} Icon={Icon} />
       <p className="text-sm text-muted-foreground leading-relaxed">
         {description}
       </p>
+      <section aria-label={t('help.overview.featuresLabel')}>
+        <h3 className="text-sm font-semibold text-muted-foreground mb-2">
+          {t('help.overview.featuresLabel')}
+        </h3>
+        <div className="grid grid-cols-1 gap-2">
+          {features.map((feature) => (
+            <div
+              key={feature.title}
+              className="rounded-md border border-border px-3 py-2"
+            >
+              <div className="text-sm font-medium">{feature.title}</div>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                {feature.body}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
       <section aria-label={t('help.overview.specsLabel')}>
         <h3 className="text-sm font-semibold text-muted-foreground mb-2">
           {t('help.overview.specsLabel')}

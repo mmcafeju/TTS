@@ -706,6 +706,10 @@
       "tooltip": "Delivery instructions (tone, emotion, pace)",
       "placeholder": "Delivery instructions — e.g. Speak slowly with warmth, Authoritative and clear…"
     },
+    "longText": {
+      "hint": "{{count}} chars — split into sentence-wise chunks and generated sequentially (limit {{limit}} chars, adjustable in Settings > Generation).",
+      "helpLink": "Help > Tutorial 5"
+    },
     "voiceSelector": {
       "placeholder": "Select a voice…"
     },
@@ -791,6 +795,14 @@
         { "label": "Recommended length", "value": "About 500 chars or fewer per chunk" },
         { "label": "Max audio duration", "value": "No hard cap — long text is auto-split and merged with crossfades" },
         { "label": "Output formats", "value": "Original (WAV) · Broadcast (EBU R128) · CD (44.1kHz/16bit) · MP3" }
+      ],
+      "featuresLabel": "Key Features",
+      "features": [
+        { "title": "Auto chunking · sequential generation (batch)", "body": "Up to 50,000 characters are split into sentence-wise chunks, generated one by one, and merged with crossfades. A 10,000-char input is processed automatically at your configured split limit (800 by default), and each segment can be edited individually afterwards." },
+        { "title": "Sentence-level repaint", "body": "Regenerate only the wrong sentence (seed preserved) and merge it as a new version instead of redoing the whole file." },
+        { "title": "Voice cloning", "body": "Clone your voice from a single 30-second sample plus reference text." },
+        { "title": "Local · offline", "body": "Synthesize, clone, convert, and process effects locally without the cloud. Free (MIT license)." },
+        { "title": "MCP agent integration", "body": "Let AI agents such as Claude Code speak through speak/transcribe tools." }
       ]
     },
     "features": {

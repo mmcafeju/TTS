@@ -48,6 +48,7 @@ export interface HelpOverview {
   descriptionKey: string;
   icon: LucideIcon;
   specsKey: string;
+  featuresKey: string;
   terms: HelpTerm[];
 }
 
@@ -87,6 +88,7 @@ export const helpOverview: HelpOverview = {
   descriptionKey: 'help.overview.description',
   icon: BookOpen,
   specsKey: 'help.overview.specs',
+  featuresKey: 'help.overview.features',
   terms: [
     { ko: '로컬 실행', en: 'Local / Offline' },
     { ko: '보이스 클로닝', en: 'Voice Cloning' },

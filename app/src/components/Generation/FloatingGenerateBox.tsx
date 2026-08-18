@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useMatchRoute } from '@tanstack/react-router';
+import { Link, useMatchRoute } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Dices, Loader2, SlidersHorizontal, Sparkles, Wand2 } from 'lucide-react';
+import { Dices, Info, Loader2, SlidersHorizontal, Sparkles, Wand2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { apiClient } from '@/lib/api/client';
 import { getLanguageOptionsForEngine, type LanguageCode } from '@/lib/constants/languages';
 import { useGenerationForm } from '@/lib/hooks/useGenerationForm';
+import { useGenerationSettings } from '@/lib/hooks/useSettings';
 import { useProfile, useProfiles } from '@/lib/hooks/useProfiles';
 import { useStory } from '@/lib/hooks/useStories';
 import { cn } from '@/lib/utils/cn';
@@ -99,6 +100,11 @@ export function FloatingGenerateBox({
     },
     getOutputFormat: () => outputFormat,
   });
+
+  const { settings: generationSettings } = useGenerationSettings();
+  const textValue = form.watch('text') ?? '';
+  const chunkLimit = generationSettings?.max_chunk_chars ?? 800;
+  const isLongText = textValue.length > chunkLimit;
 
   // Click away handler to collapse the box
   useEffect(() => {
@@ -477,6 +483,37 @@ export function FloatingGenerateBox({
                 </div>
               </div>
             </div>
+
+            {/* Long-text hint — shown once input exceeds the auto-chunk split limit */}
+            <AnimatePresence>
+              {isExpanded && isLongText && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-2 flex items-start gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+                    <Info className="h-4 w-4 shrink-0 text-accent mt-px" />
+                    <div className="min-w-0">
+                      <span>
+                        {t('generation.longText.hint', {
+                          count: textValue.length,
+                          limit: chunkLimit,
+                        })}
+                      </span>{' '}
+                      <Link
+                        to="/help"
+                        className="text-accent underline underline-offset-2 hover:text-accent/80"
+                      >
+                        {t('generation.longText.helpLink')}
+                      </Link>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Additive instruct textarea — shown below main text when toggle is on and engine supports it */}
             <AnimatePresence>

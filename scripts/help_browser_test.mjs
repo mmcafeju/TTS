@@ -132,7 +132,16 @@ async function main() {
   const tutCount = nav.filter((x) => /\b[1-5]$/.test(x.trim())).length;
   if (tutCount < 5) throw new Error(`expected 5 tutorial badges, got ${tutCount}`);
 
-  // 5. Overview panel (default selection): specs table with limits + terms
+  // 5. Overview panel (default selection): key features (batch chunking first) + specs
+  const overviewFeatures = await waitFor(cdp, `(() => {
+    const section = [...document.querySelectorAll('section')].find(s => s.getAttribute('aria-label') === '주요 특징');
+    if (!section) return null;
+    return [...section.querySelectorAll('div')].filter(d => d.className.includes('border-border')).map(d => d.textContent.trim().replace(/\\s+/g, ' '));
+  })()`, 'overview features');
+  log(`overview features (${overviewFeatures.length}): ${JSON.stringify(overviewFeatures)}`);
+  if (overviewFeatures.length !== 5) throw new Error(`expected 5 overview features, got ${overviewFeatures.length}`);
+  if (!overviewFeatures[0].includes('장문 자동 분할 · 순차 생성')) throw new Error(`batch chunking feature missing: ${overviewFeatures[0]}`);
+
   const overviewSpecs = await waitFor(cdp, SPECS_SNIPPET('생성 규격 (안정권)'), 'overview specs');
   log(`overview specs (${overviewSpecs.length}): ${JSON.stringify(overviewSpecs)}`);
   if (overviewSpecs.length !== 5) throw new Error(`expected 5 overview specs, got ${overviewSpecs.length}`);
@@ -218,6 +227,32 @@ async function main() {
   // Close dialog
   await evalValue(cdp, `(() => { const d = document.querySelector('[role="dialog"]'); if (d) { const ev = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }); document.dispatchEvent(ev); } return true; })()`);
   await sleep(300);
+
+  // 13. Long-text hint on the generate box: type >800 chars -> hint with count + link
+  await evalValue(cdp, `location.href = '/'; true`);
+  await waitFor(cdp, `location.pathname === '/'`, 'back to /');
+  await waitFor(cdp, `[...document.querySelectorAll('textarea')].length > 0`, 'generate textarea');
+  const longText = '안녕하세요. 이것은 장문 생성을 확인하기 위한 테스트 문장입니다. '.repeat(80);
+  await evalValue(cdp, `(() => {
+    const tas = [...document.querySelectorAll('textarea')];
+    const ta = tas.find(t => t.placeholder && !t.placeholder.includes('참조') && !t.placeholder.includes('지시'));
+    if (!ta) throw new Error('no generate textarea');
+    ta.click();
+    const setter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+    setter.call(ta, ${JSON.stringify(longText)});
+    ta.dispatchEvent(new Event('input', { bubbles: true }));
+    return ta.value.length;
+  })()`);
+  const hint = await waitFor(cdp, `(() => {
+    const el = [...document.querySelectorAll('div')].find(d => d.textContent.includes('장문') && d.textContent.includes('순차 생성'));
+    return el ? el.textContent.replace(/\\s+/g, ' ').trim() : null;
+  })()`, 'long-text hint');
+  log(`long-text hint: ${hint}`);
+  if (!hint.includes(String(longText.length))) throw new Error(`hint count wrong: ${hint}`);
+  if (!hint.includes('분할 한도')) throw new Error(`hint limit info missing: ${hint}`);
+  const helpLink = await evalValue(cdp, `(() => { const a = [...document.querySelectorAll('a')].find(a => a.textContent.includes('도움말')); return a ? a.getAttribute('href') : null; })()`);
+  log(`hint help link: ${helpLink}`);
+  if (helpLink !== '/help') throw new Error(`hint help link wrong: ${helpLink}`);
 
   log(`console errors: ${consoleErrors.length === 0 ? 'none' : consoleErrors.join(' | ')}`);
   if (consoleErrors.length > 0) throw new Error('console errors present');
