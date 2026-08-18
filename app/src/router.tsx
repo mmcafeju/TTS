@@ -8,6 +8,7 @@ import {
 import { AppFrame } from '@/components/AppFrame/AppFrame';
 import { CapturesTab } from '@/components/CapturesTab/CapturesTab';
 import { EffectsTab } from '@/components/EffectsTab/EffectsTab';
+import { HelpTab } from '@/components/HelpTab/HelpTab';
 import { MainEditor } from '@/components/MainEditor/MainEditor';
 import { ModelsTab } from '@/components/ModelsTab/ModelsTab';
 import { AboutPage } from '@/components/ServerTab/AboutPage';
@@ -142,6 +143,13 @@ const vcRoute = createRoute({
   component: VCTab,
 });
 
+// Help & tutorial route
+const helpRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/help',
+  component: HelpTab,
+});
+
 // Settings layout route (parent for sub-tabs)
 const settingsRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -216,6 +224,7 @@ const routeTree = rootRoute.addChildren([
   vcRoute,
   effectsRoute,
   modelsRoute,
+  helpRoute,
   settingsRoute.addChildren([
     settingsGeneralRoute,
     settingsGenerationRoute,

@@ -1,5 +1,5 @@
 import { Link, useMatchRoute } from '@tanstack/react-router';
-import { AudioLines, Box, Captions, type LucideIcon, Mic, Settings, Volume2, Wand2, Radio } from 'lucide-react';
+import { AudioLines, Box, Captions, type LucideIcon, HelpCircle, Mic, Settings, Volume2, Wand2, Radio } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import voiceboxLogo from '@/assets/voicebox-logo.png';
@@ -27,6 +27,7 @@ const tabs: Array<{
   { id: 'vc', path: '/vc', icon: Radio, labelKey: 'nav.vc' },
   { id: 'effects', path: '/effects', icon: Wand2, labelKey: 'nav.effects' },
   { id: 'models', path: '/models', icon: Box, labelKey: 'nav.models' },
+  { id: 'help', path: '/help', icon: HelpCircle, labelKey: 'nav.help' },
   { id: 'settings', path: '/settings', icon: Settings, labelKey: 'nav.settings' },
 ];
 

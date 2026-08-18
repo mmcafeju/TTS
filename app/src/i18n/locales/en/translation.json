@@ -21,7 +21,8 @@
     "models": "Models",
     "settings": "Settings",
     "updateBadge": "Update",
-    "vc": "Voice Conv"
+    "vc": "Voice Conv",
+    "help": "Help"
   },
   "captures": {
     "title": "Captures",
@@ -766,6 +767,46 @@
       "dialogDescription": "Import the profile from \"{{name}}\". This will create a new profile with all samples.",
       "importing": "Importing…",
       "action": "Import"
+    }
+  },
+  "help": {
+    "title": "Help",
+    "subtitle": "Learn about the main features and how to use them. Select a feature on the left to see its details and terminology.",
+    "termsLabel": "Related Terms",
+    "tutorialAction": "Go to tutorial menu",
+    "features": {
+      "generate": {
+        "title": "Text-to-Speech (TTS)",
+        "description": "Enter text, pick a voice profile, and the AI synthesizes speech. You can regenerate individual sentence chunks, set a seed, and choose an output format (broadcast/CD/MP3)."
+      },
+      "stories": {
+        "title": "Stories",
+        "description": "Assign multiple voice profiles to characters and compose conversational audio stories. Add narration tracks per character and edit their order."
+      },
+      "captures": {
+        "title": "Audio Capture",
+        "description": "Capture audio with a hotkey and turn input into text using dictation or transcription."
+      },
+      "voices": {
+        "title": "Voice Profiles",
+        "description": "Create voice profiles and manage samples. Import or export .voicebox.zip profiles; samples drive voice cloning."
+      },
+      "vc": {
+        "title": "Voice Conversion (VC)",
+        "description": "Convert recorded audio into another voice with the RVC engine. Tune timestamps, detection threshold, pitch shift, and more."
+      },
+      "effects": {
+        "title": "Audio Effects",
+        "description": "Apply audio effects such as reverb and equalizer to generated audio, and save them as reusable presets."
+      },
+      "models": {
+        "title": "Models",
+        "description": "Check the active TTS model, download and manage new models, and verify GPU acceleration."
+      },
+      "settings": {
+        "title": "Settings",
+        "description": "Manage app-wide settings such as server URL, language, and theme. Logs, changelog, and app info live here too."
+      }
     }
   },
   "settings": {
