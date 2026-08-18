@@ -742,6 +742,17 @@
       }
     }
   },
+  "chunkEditor": {
+    "completedTitle": "구간 재생성 완료",
+    "completedDescription": "수정한 구간이 합쳐져 새 버전으로 저장되었습니다.",
+    "failedTitle": "구간 재생성 실패",
+    "failedDescription": "이 구간을 재생성하지 못했습니다.",
+    "sentence": "문장 {{n}}",
+    "sentenceLabel": "문장 {{n}}",
+    "textPlaceholder": "텍스트를 수정한 뒤 재생성…",
+    "seedPlaceholder": "시드 (선택)",
+    "regenerateAction": "구간 재생성"
+  },
   "main": {
     "importVoice": "음성 가져오기",
     "createVoice": "음성 만들기",

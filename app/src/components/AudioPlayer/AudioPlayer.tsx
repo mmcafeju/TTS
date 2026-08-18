@@ -9,6 +9,7 @@ import { formatAudioDuration } from '@/lib/utils/audio';
 import { debug } from '@/lib/utils/debug';
 import { usePlatform } from '@/platform/PlatformContext';
 import { usePlayerStore } from '@/stores/playerStore';
+import { ChunkEditor } from './ChunkEditor';
 
 export function AudioPlayer() {
   const platform = usePlatform();
@@ -558,6 +559,8 @@ export function AudioPlayer() {
             />
 
             {error && <div className="text-xs text-destructive text-center py-2">{error}</div>}
+
+            <ChunkEditor duration={duration} />
           </div>
 
           {/* Time Display */}

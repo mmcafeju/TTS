@@ -742,6 +742,17 @@
       }
     }
   },
+  "chunkEditor": {
+    "completedTitle": "Segment regenerated",
+    "completedDescription": "The edited segment has been spliced back in and saved as a new version.",
+    "failedTitle": "Regeneration failed",
+    "failedDescription": "Could not regenerate this segment.",
+    "sentence": "Sentence {{n}}",
+    "sentenceLabel": "Sentence {{n}}",
+    "textPlaceholder": "Correct the text, then regenerate…",
+    "seedPlaceholder": "Seed (optional)",
+    "regenerateAction": "Regenerate segment"
+  },
   "main": {
     "importVoice": "Import Voice",
     "createVoice": "Create Voice",

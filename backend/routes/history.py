@@ -102,6 +102,7 @@ async def get_generation(
         error=gen.error,
         is_favorited=bool(gen.is_favorited),
         created_at=gen.created_at,
+        chunks=history.build_generation_response(gen).chunks,
     )
 
 

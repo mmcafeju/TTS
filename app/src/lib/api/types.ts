@@ -97,6 +97,20 @@ export interface GenerationVersionResponse {
   created_at: string;
 }
 
+export interface ChunkMeta {
+  index: number;
+  text: string;
+  start_ms: number;
+  end_ms: number;
+  duration_ms: number;
+}
+
+export interface ChunkRegenerateRequest {
+  text_override?: string;
+  seed?: number;
+  crossfade_ms?: number;
+}
+
 export interface GenerationResponse {
   id: string;
   profile_id: string;
@@ -114,6 +128,7 @@ export interface GenerationResponse {
   created_at: string;
   versions?: GenerationVersionResponse[];
   active_version_id?: string;
+  chunks?: ChunkMeta[];
 }
 
 export interface HistoryQuery {

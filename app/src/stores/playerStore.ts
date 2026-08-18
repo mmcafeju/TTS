@@ -13,6 +13,7 @@ interface PlayerState {
   shouldRestart: boolean;
   shouldAutoPlay: boolean;
   onFinish: (() => void) | null;
+  selectedChunkIndex: number | null;
 
   setAudio: (url: string, id: string, profileId: string | null, title?: string) => void;
   setAudioWithAutoPlay: (url: string, id: string, profileId: string | null, title?: string) => void;
@@ -25,6 +26,7 @@ interface PlayerState {
   clearRestartFlag: () => void;
   clearAutoPlayFlag: () => void;
   setOnFinish: (callback: (() => void) | null) => void;
+  setSelectedChunkIndex: (index: number | null) => void;
   reset: () => void;
 }
 
@@ -41,6 +43,7 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   shouldRestart: false,
   shouldAutoPlay: false,
   onFinish: null,
+  selectedChunkIndex: null,
 
   setAudio: (url, id, profileId, title) =>
     set({
@@ -52,6 +55,7 @@ export const usePlayerStore = create<PlayerState>((set) => ({
       isPlaying: false,
       shouldRestart: false,
       shouldAutoPlay: false,
+      selectedChunkIndex: null,
     }),
   setAudioWithAutoPlay: (url, id, profileId, title) =>
     set({
@@ -63,6 +67,7 @@ export const usePlayerStore = create<PlayerState>((set) => ({
       isPlaying: false,
       shouldRestart: false,
       shouldAutoPlay: true,
+      selectedChunkIndex: null,
     }),
   setIsPlaying: (playing) => set({ isPlaying: playing }),
   setCurrentTime: (time) => set({ currentTime: time }),
@@ -73,6 +78,7 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   clearRestartFlag: () => set({ shouldRestart: false }),
   clearAutoPlayFlag: () => set({ shouldAutoPlay: false }),
   setOnFinish: (callback) => set({ onFinish: callback }),
+  setSelectedChunkIndex: (index) => set({ selectedChunkIndex: index }),
   reset: () =>
     set({
       audioUrl: null,
@@ -86,5 +92,6 @@ export const usePlayerStore = create<PlayerState>((set) => ({
       shouldRestart: false,
       shouldAutoPlay: false,
       onFinish: null,
+      selectedChunkIndex: null,
     }),
 }));

@@ -46,6 +46,7 @@ import type {
   CaptureSettings,
   CaptureSettingsUpdate,
   CaptureSource,
+  ChunkRegenerateRequest,
   GenerationSettings,
   GenerationSettingsUpdate,
   MCPClientBinding,
@@ -280,6 +281,20 @@ class ApiClient {
     return this.request<GenerationResponse>(`/generate/${generationId}/regenerate`, {
       method: 'POST',
     });
+  }
+
+  async regenerateChunk(
+    generationId: string,
+    chunkIndex: number,
+    data: ChunkRegenerateRequest,
+  ): Promise<GenerationResponse> {
+    return this.request<GenerationResponse>(
+      `/generate/${generationId}/chunks/${chunkIndex}/regenerate`,
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      },
+    );
   }
 
   async importAudio(file: File): Promise<GenerationResponse> {
