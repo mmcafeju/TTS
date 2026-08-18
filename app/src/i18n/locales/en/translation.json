@@ -257,6 +257,10 @@
       "record": "Record",
       "system": "System Audio"
     },
+    "qualityGuide": {
+      "title": "High-quality Voice Spec",
+      "hint": "Clone quality depends on sample quality. Following the spec below yields better results. (See Help > Tutorial 1 for the full steps.)"
+    },
     "fields": {
       "engine": "Engine",
       "voice": "Voice",
@@ -771,9 +775,24 @@
   },
   "help": {
     "title": "Help",
-    "subtitle": "Learn about the main features and how to use them. Select a feature on the left to see its details and terminology.",
+    "subtitle": "App overview, feature guides, and step-by-step tutorials. Pick an item on the left.",
     "termsLabel": "Related Terms",
-    "tutorialAction": "Go to tutorial menu",
+    "tutorialAction": "Go to menu",
+    "tutorialsSection": "Tutorials",
+    "stepLabel": "Step",
+    "relatedTutorial": "Related tutorial",
+    "overview": {
+      "title": "App Overview",
+      "description": "Voicebox is a local, open-source voice synthesis (TTS) automation studio. Without any cloud, it handles speech synthesis, voice cloning, voice conversion, effects, stories, and dictation in one app. Free (MIT license), with automatic output-format conversion (broadcast/CD/MP3) and MCP agent integration.",
+      "specsLabel": "Generation Specs (Safe Range)",
+      "specs": [
+        { "label": "Text per request", "value": "Up to 50,000 characters" },
+        { "label": "Auto chunk splitting", "value": "Sentence-wise, 800 chars by default (configurable 100–5,000)" },
+        { "label": "Recommended length", "value": "About 500 chars or fewer per chunk" },
+        { "label": "Max audio duration", "value": "No hard cap — long text is auto-split and merged with crossfades" },
+        { "label": "Output formats", "value": "Original (WAV) · Broadcast (EBU R128) · CD (44.1kHz/16bit) · MP3" }
+      ]
+    },
     "features": {
       "generate": {
         "title": "Text-to-Speech (TTS)",
@@ -806,6 +825,89 @@
       "settings": {
         "title": "Settings",
         "description": "Manage app-wide settings such as server URL, language, and theme. Logs, changelog, and app info live here too."
+      }
+    },
+    "tutorials": {
+      "voice-cloning": {
+        "title": "Voice Cloning",
+        "subtitle": "Make TTS with your own voice",
+        "specsLabel": "High-quality Voice Spec",
+        "specs": [
+          { "label": "Length", "value": "10–30 seconds (max 30s; one clean 30s sample is ideal)" },
+          { "label": "File format", "value": "wav · mp3 · m4a source audio (no background music or effects)" },
+          { "label": "Speaker", "value": "A single person's voice only (no overlapping speech)" },
+          { "label": "Environment", "value": "Quiet room · steady mic distance · natural tone" },
+          { "label": "Reference text", "value": "Must match what is spoken exactly (auto-fill with the transcribe button)" }
+        ],
+        "steps": [
+          { "title": "Prepare", "body": "Record a ~30-second voice sample in a quiet place. Minimize background noise and speak in a natural tone. (See the high-quality voice spec above.)" },
+          { "title": "Start creating a profile", "body": "Click 'Create Voice' on the main dashboard or 'New Voice' in the Voices tab." },
+          { "title": "Pick a source", "body": "Select 'Clone from audio'. (Choose 'Built-in voice' if you prefer a preset.)" },
+          { "title": "Register a sample", "body": "Upload, record, or capture system audio that meets the high-quality spec. A toast warns you if it exceeds 30 seconds." },
+          { "title": "Enter reference text", "body": "Type exactly what is spoken in the sample (1–1000 chars). Use the 'Transcribe' button to auto-fill. The closer the match, the better the clone." },
+          { "title": "Save profile info", "body": "Enter name (required), description, language, default engine, default effect, and personality, then click 'Create Profile'." },
+          { "title": "Generate your first audio", "body": "On the dashboard select the new profile card, type text in the generate box, and click 'Generate Voice'." },
+          { "title": "Fine-tune", "body": "If a sentence sounds off, click the sentence and use 'Regenerate Chunk' to fix just that part. (Tutorial 2)" }
+        ]
+      },
+      "repaint": {
+        "title": "Sentence-level Regeneration",
+        "subtitle": "Fix only the wrong sentence, not the whole file",
+        "steps": [
+          { "title": "Play a result", "body": "Click a generation in history to play it. Sentence chunk markers appear over the waveform." },
+          { "title": "Select a sentence", "body": "Click a sentence chip (number) to open the edit panel." },
+          { "title": "Edit the text", "body": "Correct the sentence text (pronunciation or typos). Seed is optional — reusing the same seed keeps the tone consistent." },
+          { "title": "Regenerate chunk", "body": "Press 'Regenerate Chunk'. Only that segment is re-synthesized, merged as a new version, and auto-played." },
+          { "title": "Switch sentences", "body": "Switching to another chip restores the original text as a prefilled draft." }
+        ]
+      },
+      "vc": {
+        "title": "RVC Voice Conversion",
+        "subtitle": "Convert recorded audio into a trained model's voice",
+        "steps": [
+          { "title": "Start training", "body": "In the Voice Conversion tab, enter a model name and select dataset audio (wav/mp3, multi-select). At least 5 minutes of rich speech is recommended." },
+          { "title": "Set training options", "body": "Choose sample rate (32/40/48kHz), F0 method (rmvpe recommended), epochs (default 100), and batch size (default 4)." },
+          { "title": "Run training", "body": "Press 'Start Training'. When finished, the model status becomes 'Ready'." },
+          { "title": "Prepare conversion", "body": "In the Convert panel select the trained model (a ready model is auto-selected)." },
+          { "title": "Pick source audio", "body": "Choose the source audio, then tune index ratio (default 0.75) and pitch shift (default 0; +12 = one octave up)." },
+          { "title": "Convert and check", "body": "Press 'Convert', then use 'Listen to Result' once it finishes." }
+        ]
+      },
+      "instruct": {
+        "title": "Delivery Instructions",
+        "subtitle": "Direct emotion, pace, and tone in plain language",
+        "specsLabel": "Example instructions",
+        "specs": [
+          { "label": "Emotion", "value": "'Very excited and upbeat' · 'Calm and solemn' · 'Thoughtful and gentle'" },
+          { "label": "Pace", "value": "'Slower than usual, with clear separation between words' · 'Fast and tense'" },
+          { "label": "Tone", "value": "'Authoritative and clear' · 'Soft and affectionate' · 'Mysterious, low voice'" },
+          { "label": "Combined", "value": "'Urgent and fast, but emphasize the final sentence slowly'" },
+          { "label": "Max length", "value": "500 characters" }
+        ],
+        "steps": [
+          { "title": "Pick the engine", "body": "Delivery instructions are only supported by the Qwen CustomVoice engine. Select it in the generate box." },
+          { "title": "Expand instructions", "body": "Click 'Show Delivery Instructions' in the generate box to reveal the input." },
+          { "title": "Write instructions", "body": "Describe emotion, pace, and tone in natural language (up to 500 chars). More specific instructions are reflected better in the result." },
+          { "title": "Generate", "body": "Press 'Generate Voice' with your main text. Speech is synthesized according to the instructions." },
+          { "title": "Fine-tune", "body": "If the result is off, rephrase the instructions or regenerate just that sentence (Tutorial 2)." }
+        ]
+      },
+      "long-text": {
+        "title": "Long-form Text Generation",
+        "subtitle": "Generate books, articles, and scripts in one pass",
+        "specsLabel": "Long-form Specs",
+        "specs": [
+          { "label": "Input limit", "value": "Up to 50,000 characters per request" },
+          { "label": "Chunk splitting", "value": "Sentence-wise, 800 chars by default (configurable 100–5,000)" },
+          { "label": "Merging", "value": "Crossfaded (default 50ms) for seamless joins" }
+        ],
+        "steps": [
+          { "title": "Paste long text", "body": "Paste your text into the generate box (up to 50,000 chars). Natural paragraph and sentence breaks improve splitting quality." },
+          { "title": "Auto-split and generate", "body": "The app splits text at sentence boundaries into ~800-char chunks, generates each in order, and merges them with crossfades without stopping." },
+          { "title": "Tune the split size", "body": "Adjust it in Settings > Generation > 'Auto Chunk Split Limit'. Smaller chunks improve long-form quality but take longer." },
+          { "title": "Check the result", "body": "The full piece is saved as a single generation. Use the sentence markers over the waveform to inspect each segment." },
+          { "title": "Fix specific parts", "body": "Click a sentence marker and use 'Regenerate Chunk' to fix only that part. (Tutorial 2)" }
+        ]
       }
     }
   },

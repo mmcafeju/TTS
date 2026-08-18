@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
-import { Edit2, Mic, Monitor, Music, Upload, X } from 'lucide-react';
+import { Edit2, Info, Mic, Monitor, Music, Upload, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -123,6 +123,45 @@ function base64ToFile(base64: string, fileName: string, fileType: string): File 
     u8arr[n] = bstr.charCodeAt(n);
   }
   return new File([u8arr], fileName, { type: fileType });
+}
+
+interface QualitySpecItem {
+  label: string;
+  value: string;
+}
+
+function QualitySpecBox() {
+  const { t } = useTranslation();
+  const specs = t('help.tutorials.voice-cloning.specs', {
+    returnObjects: true,
+  }) as QualitySpecItem[];
+
+  return (
+    <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
+      <div className="flex items-center gap-2">
+        <Info className="h-4 w-4 shrink-0 text-accent" />
+        <span className="text-sm font-semibold">
+          {t('profileForm.qualityGuide.title')}
+        </span>
+      </div>
+      <p className="text-xs text-muted-foreground leading-relaxed">
+        {t('profileForm.qualityGuide.hint')}
+      </p>
+      <div className="grid grid-cols-1 gap-1.5">
+        {specs.map((spec) => (
+          <div
+            key={spec.label}
+            className="flex items-baseline justify-between gap-3 text-xs"
+          >
+            <span className="font-medium shrink-0">{spec.label}</span>
+            <span className="text-muted-foreground text-right">
+              {spec.value}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export function ProfileForm() {
@@ -935,6 +974,7 @@ export function ProfileForm() {
                         </div>
                       ) : (
                         <>
+                          <QualitySpecBox />
                           <Tabs
                             className="pt-0"
                             value={sampleMode}

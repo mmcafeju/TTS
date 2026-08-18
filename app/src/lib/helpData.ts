@@ -1,11 +1,15 @@
 import {
   AudioLines,
+  BookOpen,
   Box,
   Captions,
   type LucideIcon,
   Mic,
   Radio,
+  Repeat,
+  ScrollText,
   Settings,
+  Sparkles,
   Volume2,
   Wand2,
 } from 'lucide-react';
@@ -13,12 +17,14 @@ import {
 /**
  * Help / tutorial content data for the Voicebox Web UI.
  *
- * Each feature links to its in-app tab (tutorial target) and carries a small
- * bilingual glossary so technical terms show their English original next to
- * the localized menu name (용어 병기).
+ * Structure:
+ *  - helpOverview:  App overview (differentiation + generation specs).
+ *  - helpFeatures:  In-app tabs, each with a bilingual glossary and an
+ *                   optional linked tutorial.
+ *  - helpTutorials: Step-by-step tutorials (steps/specs text lives in i18n).
  *
- * Localized titles/descriptions live in i18n (`help.features.<id>.*`); this
- * module owns the structure, order, icons, tutorial routes, and terminology.
+ * Localized titles/descriptions live in i18n (`help.*`); this module owns the
+ * structure, order, icons, tutorial routes, and terminology.
  */
 
 export type HelpFeaturePath =
@@ -36,6 +42,15 @@ export interface HelpTerm {
   en: string;
 }
 
+export interface HelpOverview {
+  id: 'overview';
+  titleKey: string;
+  descriptionKey: string;
+  icon: LucideIcon;
+  specsKey: string;
+  terms: HelpTerm[];
+}
+
 export interface HelpFeature {
   id: string;
   titleKey: string;
@@ -43,7 +58,42 @@ export interface HelpFeature {
   path: HelpFeaturePath;
   icon: LucideIcon;
   terms: HelpTerm[];
+  tutorialId?: HelpTutorialId;
 }
+
+export interface HelpTutorial {
+  id: HelpTutorialId;
+  index: number;
+  titleKey: string;
+  subtitleKey: string;
+  icon: LucideIcon;
+  featureId: string;
+  targetPath: HelpFeaturePath;
+  terms: HelpTerm[];
+  specsKey?: string;
+  stepsKey: string;
+}
+
+export type HelpTutorialId =
+  | 'voice-cloning'
+  | 'repaint'
+  | 'vc-tutorial'
+  | 'instruct'
+  | 'long-text';
+
+export const helpOverview: HelpOverview = {
+  id: 'overview',
+  titleKey: 'help.overview.title',
+  descriptionKey: 'help.overview.description',
+  icon: BookOpen,
+  specsKey: 'help.overview.specs',
+  terms: [
+    { ko: '로컬 실행', en: 'Local / Offline' },
+    { ko: '보이스 클로닝', en: 'Voice Cloning' },
+    { ko: '문장 단위 재생성', en: 'Chunk-level Repaint' },
+    { ko: '에이전트 연동', en: 'MCP Agent Integration' },
+  ],
+};
 
 export const helpFeatures: HelpFeature[] = [
   {
@@ -52,6 +102,7 @@ export const helpFeatures: HelpFeature[] = [
     descriptionKey: 'help.features.generate.description',
     path: '/',
     icon: Volume2,
+    tutorialId: 'repaint',
     terms: [
       { ko: '음성 합성', en: 'Text-to-Speech (TTS)' },
       { ko: '음성 프로필', en: 'Voice Profile' },
@@ -92,6 +143,7 @@ export const helpFeatures: HelpFeature[] = [
     descriptionKey: 'help.features.voices.description',
     path: '/voices',
     icon: Mic,
+    tutorialId: 'voice-cloning',
     terms: [
       { ko: '음성 프로필', en: 'Voice Profile' },
       { ko: '샘플', en: 'Voice Sample' },
@@ -105,6 +157,7 @@ export const helpFeatures: HelpFeature[] = [
     descriptionKey: 'help.features.vc.description',
     path: '/vc',
     icon: Radio,
+    tutorialId: 'vc-tutorial',
     terms: [
       { ko: '음성 변환', en: 'Voice Conversion (VC)' },
       { ko: '타임스탬프', en: 'Timestamp' },
@@ -152,6 +205,107 @@ export const helpFeatures: HelpFeature[] = [
   },
 ];
 
+export const helpTutorials: HelpTutorial[] = [
+  {
+    id: 'voice-cloning',
+    index: 1,
+    titleKey: 'help.tutorials.voice-cloning.title',
+    subtitleKey: 'help.tutorials.voice-cloning.subtitle',
+    icon: Mic,
+    featureId: 'voices',
+    targetPath: '/voices',
+    specsKey: 'help.tutorials.voice-cloning.specs',
+    stepsKey: 'help.tutorials.voice-cloning.steps',
+    terms: [
+      { ko: '음성 클로닝', en: 'Voice Cloning' },
+      { ko: '샘플', en: 'Voice Sample' },
+      { ko: '참조 텍스트', en: 'Reference Text' },
+      { ko: '음성 프로필', en: 'Voice Profile' },
+    ],
+  },
+  {
+    id: 'repaint',
+    index: 2,
+    titleKey: 'help.tutorials.repaint.title',
+    subtitleKey: 'help.tutorials.repaint.subtitle',
+    icon: Repeat,
+    featureId: 'generate',
+    targetPath: '/',
+    stepsKey: 'help.tutorials.repaint.steps',
+    terms: [
+      { ko: '청크', en: 'Chunk' },
+      { ko: '구간 재생성', en: 'Regenerate' },
+      { ko: '시드', en: 'Seed' },
+      { ko: '크로스페이드', en: 'Crossfade' },
+    ],
+  },
+  {
+    id: 'vc-tutorial',
+    index: 3,
+    titleKey: 'help.tutorials.vc.title',
+    subtitleKey: 'help.tutorials.vc.subtitle',
+    icon: Radio,
+    featureId: 'vc',
+    targetPath: '/vc',
+    stepsKey: 'help.tutorials.vc.steps',
+    terms: [
+      { ko: '음성 변환', en: 'Voice Conversion' },
+      { ko: 'RVC', en: 'Retrieval-based Voice Conversion' },
+      { ko: 'F0', en: 'Fundamental Frequency' },
+      { ko: '에폭', en: 'Epoch' },
+    ],
+  },
+  {
+    id: 'instruct',
+    index: 4,
+    titleKey: 'help.tutorials.instruct.title',
+    subtitleKey: 'help.tutorials.instruct.subtitle',
+    icon: Sparkles,
+    featureId: 'generate',
+    targetPath: '/',
+    specsKey: 'help.tutorials.instruct.specs',
+    stepsKey: 'help.tutorials.instruct.steps',
+    terms: [
+      { ko: '전달 지시사항', en: 'Delivery Instruction' },
+      { ko: '감정', en: 'Emotion' },
+      { ko: '속도', en: 'Pace' },
+      { ko: '톤', en: 'Tone' },
+    ],
+  },
+  {
+    id: 'long-text',
+    index: 5,
+    titleKey: 'help.tutorials.long-text.title',
+    subtitleKey: 'help.tutorials.long-text.subtitle',
+    icon: ScrollText,
+    featureId: 'generate',
+    targetPath: '/',
+    specsKey: 'help.tutorials.long-text.specs',
+    stepsKey: 'help.tutorials.long-text.steps',
+    terms: [
+      { ko: '장문', en: 'Long-form Text' },
+      { ko: '청크 분할', en: 'Chunk Splitting' },
+      { ko: '크로스페이드', en: 'Crossfade' },
+      { ko: '문장 마커', en: 'Sentence Marker' },
+    ],
+  },
+];
+
 export function getHelpFeature(id: string): HelpFeature {
   return helpFeatures.find((f) => f.id === id) ?? helpFeatures[0];
 }
+
+export function getHelpTutorial(id: string): HelpTutorial | undefined {
+  return helpTutorials.find((t) => t.id === id);
+}
+
+export type HelpMenuItemId =
+  | HelpOverview['id']
+  | HelpFeature['id']
+  | HelpTutorial['id'];
+
+export const helpMenuOrder: HelpMenuItemId[] = [
+  'overview',
+  ...helpFeatures.map((f) => f.id),
+  ...helpTutorials.map((t) => t.id),
+];
