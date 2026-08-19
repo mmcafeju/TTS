@@ -949,7 +949,8 @@
     },
     "general": {
       "docs": {
-        "title": "문서 읽기"
+        "title": "문서 읽기",
+        "subtitle": "로컬 사용자 매뉴얼"
       },
       "discord": {
         "title": "Discord 참여하기",
@@ -1058,8 +1059,8 @@
           "body": "몇 초의 참조 오디오면 충분합니다. 원할 경우 여러 샘플로 더 높은 품질 지원."
         },
         "engines": {
-          "title": "7개 엔진, 23개 언어.",
-          "body": "품질, 속도, 다국어 지원 중 원하는 트레이드오프를 선택하세요."
+          "title": "3개 엔진, 32개 언어.",
+          "body": "품질, 속도, 다국어 지원 중 원하는 트레이드오프를 선택하세요. (Qwen TTS · Qwen CustomVoice · Supertonic)"
         },
         "agentReady": {
           "title": "에이전트 지원.",
@@ -1364,6 +1365,7 @@
     "about": {
       "tagline": "오픈소스 음성 합성 스튜디오. 음성 복제, 음성 생성, 효과 적용, 음성 기반 앱 구축 — 모두 기기에서 로컬로 실행됩니다.",
       "createdBy": "만든 사람",
+      "customBuild": "커스텀 빌드",
       "buyCoffee": "커피 한 잔 사주기",
       "license": "<link>MIT</link> 라이선스"
     }

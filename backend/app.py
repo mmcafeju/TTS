@@ -221,6 +221,18 @@ def _mount_frontend(application: FastAPI) -> None:
             name="frontend-assets",
         )
 
+    # Mount the user-editable HTML manual at /manual (project root /manual).
+    # Served independently of the SPA so docs survive frontend rebuilds and
+    # can be edited in place without touching the app bundle.
+    manual_dir = Path(__file__).resolve().parent.parent / "manual"
+    if manual_dir.is_dir():
+        application.mount(
+            "/manual",
+            StaticFiles(directory=str(manual_dir), html=True),
+            name="user-manual",
+        )
+        logger.info("Manual: serving user manual from %s", manual_dir)
+
     # SPA catch-all: serve files if they exist, otherwise index.html for
     # client-side routes like /voices, /stories, /models, etc.
     @application.get("/{full_path:path}")

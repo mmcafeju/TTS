@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Voicebox 사용자 매뉴얼</title>
+<meta name="description" content="Voicebox(커스텀 빌드) 사용자 매뉴얼 — 음성 합성, 보이스 클로닝, 음성 변환, 스토리, 캡처, 효과, 모델, 설정 안내"/>
+<style>
+  :root {
+    --background: #ffffff;
+    --foreground: #1a1a1a;
+    --card: #ffffff;
+    --card-border: #e6e6e6;
+    --muted: #f4f4f5;
+    --muted-foreground: #6b7280;
+    --accent: #6d28d9;
+    --accent-soft: #f5f3ff;
+    --border: #e5e5e5;
+    --primary: #111827;
+    --code-bg: #f9fafb;
+    --shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  [data-theme="dark"] {
+    --background: #0b0b0f;
+    --foreground: #ededed;
+    --card: #111115;
+    --card-border: #26262c;
+    --muted: #1a1a20;
+    --muted-foreground: #9ca3af;
+    --accent: #a78bfa;
+    --accent-soft: rgba(139, 92, 246, .12);
+    --border: #26262c;
+    --primary: #f3f4f6;
+    --code-bg: #17171c;
+    --shadow: 0 1px 3px rgba(0,0,0,.4);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    background: var(--background);
+    color: var(--foreground);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+  /* ── Sidebar ── */
+  aside {
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    background: var(--card); border-right: 1px solid var(--border);
+    padding: 1rem 0.75rem;
+  }
+  .brand { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1rem; padding: 0.25rem 0.75rem 0.75rem; }
+  .brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+  #search {
+    width: 100%; padding: 0.5rem 0.75rem; margin-bottom: 0.75rem;
+    border: 1px solid var(--border); border-radius: 8px; background: var(--muted);
+    color: var(--foreground); font-size: 0.85rem; outline: none;
+  }
+  #search:focus { border-color: var(--accent); }
+  nav a, nav .group-label {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.4rem 0.75rem; margin: 1px 0; border-radius: 8px;
+    color: var(--muted-foreground); text-decoration: none; font-size: 0.9rem;
+  }
+  nav a:hover { background: var(--accent-soft); color: var(--foreground); }
+  nav a.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  nav .group-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted-foreground); padding-top: 0.9rem; font-weight: 600; }
+  nav .sub { padding-left: 1.4rem; }
+  .theme-toggle {
+    position: absolute; bottom: 1rem; right: 0.75rem; width: 2rem; height: 2rem;
+    display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--border);
+    background: var(--card); color: var(--muted-foreground); cursor: pointer;
+  }
+  .theme-toggle:hover { color: var(--foreground); }
+  /* ── Main ── */
+  main { padding: 2.5rem 3rem 4rem; max-width: 900px; width: 100%; }
+  h1 { font-size: 1.9rem; margin: 0 0 0.25rem; }
+  .lead { font-size: 1.05rem; color: var(--muted-foreground); margin: 0 0 1.5rem; }
+  h2 { font-size: 1.4rem; margin: 2.2rem 0 0.75rem; padding-bottom: 0.35rem; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; }
+  p { margin: 0.5rem 0; }
+  ul, ol { margin: 0.5rem 0; padding-left: 1.4rem; }
+  li { margin: 0.3rem 0; }
+  code { background: var(--code-bg); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; font-size: 0.85em; font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1rem; overflow-x: auto; }
+  pre code { background: none; border: none; padding: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 0.75rem 0; font-size: 0.9rem; }
+  th, td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; }
+  th { background: var(--muted); font-weight: 600; }
+  .note { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 0.6rem 0.9rem; border-radius: 0 8px 8px 0; margin: 0.9rem 0; font-size: 0.92rem; }
+  .warn { border-left-color: #d97706; background: rgba(217,119,6,.08); }
+  .step { display: flex; gap: 0.75rem; margin: 0.9rem 0; }
+  .step .num {
+    flex-shrink: 0; width: 1.7rem; height: 1.7rem; border-radius: 50%;
+    background: var(--accent); color: #fff; display: grid; place-items: center; font-size: 0.85rem; font-weight: 700; margin-top: 0.1rem;
+  }
+  .step h4 { margin: 0 0 0.2rem; font-size: 0.98rem; }
+  .step p { margin: 0; font-size: 0.92rem; color: var(--muted-foreground); }
+  .section { display: none; }
+  .section.active { display: block; animation: fade .2s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @media (max-width: 800px) {
+    .layout { grid-template-columns: 1fr; }
+    aside { position: relative; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+    .theme-toggle { position: fixed; top: 0.75rem; right: 0.75rem; }
+    main { padding: 1.5rem 1.25rem 3rem; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside>
+    <div class="brand"><span class="dot"></span> Voicebox 매뉴얼</div>
+    <input id="search" type="search" placeholder="검색… (Ctrl+K)" autocomplete="off"/>
+    <nav id="nav"></nav>
+    <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌓</button>
+  </aside>
+
+  <main id="content"></main>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// 매뉴얼 콘텐츠. 이 배열을 편집해서 문서를 보완할 수 있습니다.
+// 각 섹션: { id, label, group, html }
+// ─────────────────────────────────────────────────────────────
+const SECTIONS = [
+  {
+    id: "introduction",
+    label: "소개",
+    group: "시작하기",
+    html: `
+      <h1>Voicebox 사용자 매뉴얼</h1>
+      <p class="lead">오픈소스 로컬 음성 합성 스튜디오 — 내 목소리로 TTS를 만들고, 생성·복제·변환·효과를 모두 내 컴퓨터에서 처리합니다.</p>
+
+      <h2>이 빌드의 특징 (커스텀 빌드 — Elijah)</h2>
+      <ul>
+        <li><strong>3개 TTS 엔진</strong> — Qwen TTS, Qwen CustomVoice, Supertonic</li>
+        <li><strong>32개 언어</strong> — 한중일·영어·유럽·중동 등 다국어 지원</li>
+        <li><strong>완전 로컬·오프라인</strong> — 클라우드 없이 무료(MIT)로 합성·복제</li>
+        <li><strong>보이스 클로닝</strong> — 30초 샘플 하나로 내 목소리 복제</li>
+        <li><strong>장문 자동 분할</strong> — 최대 50,000자, 크로스페이드 병합</li>
+        <li><strong>MCP 에이전트 연동</strong> — AI 에이전트가 음성으로 말하게 하기</li>
+      </ul>
+
+      <h2>빠른 링크</h2>
+      <ul>
+        <li><a href="#quick-start">빠른 시작 (5분)</a></li>
+        <li><a href="#voice-cloning">보이스 클로닝</a></li>
+        <li><a href="#engines">엔진 선택 가이드</a></li>
+        <li><a href="#troubleshooting">문제 해결</a></li>
+      </ul>
+    `,
+  },
+  {
+    id: "quick-start",
+    label: "빠른 시작",
+    group: "시작하기",
+    html: `
+      <h1>빠른 시작</h1>
+      <p class="lead">5분 안에 첫 음성을 생성해 봅니다.</p>
+
+      <div class="step"><span class="num">1</span><div><h4>서버 실행</h4><p>앱을 실행하면 로컬 서버(기본 <code>http://127.0.0.1:17493</code>)가 자동으로 시작됩니다. 브라우저에서 해당 주소로 접속합니다.</p></div></div>
+      <div class="step"><span class="num">2</span><div><h4>내장 음성 사용</h4><p>기본 화면의 <strong>음성(Voice Profiles)</strong> 탭에서 <strong>내장 음성(Preset)</strong> 중 하나를 선택합니다. (복제 없이 즉시 사용 가능)</p></div></div>
+      <div class="step"><span class="num">3</span><div><h4>텍스트 입력</h4><p>메인 대시보드의 생성 박스에 문장을 입력합니다. 기본 800자 단위로 자동 청크 분할되며, 한 번에 최대 50,000자까지 입력할 수 있습니다.</p></div></div>
+      <div class="step"><span class="num">4</span><div><h4>음성 생성</h4><p><strong>음성 생성</strong> 버튼을 누르면 합성이 시작되고, 완료되면 자동 재생됩니다.</p></div></div>
+      <div class="step"><span class="num">5</span><div><h4>세부 다듬기</h4><p>결과의 특정 문장이 마음에 안 들면 웨이브폼 위 문장 마커를 클릭하고 <strong>구간 재생성(Repaint)</strong>으로 해당 문장만 교정합니다.</p></div></div>
+
+      <div class="note">생성이 안 되면 <a href="#troubleshooting">문제 해결</a>에서 <strong>모델 다운로드</strong> 확인 및 <strong>GPU 가속</strong> 항목을 확인하세요.</div>
+    `,
+  },
+  {
+    id: "engines",
+    label: "엔진 선택 가이드",
+    group: "핵심 기능",
+    html: `
+      <h1>엔진 선택 가이드</h1>
+      <p class="lead">이 빌드는 3개 엔진을 지원합니다. 품질·속도·다국어 지원 중 원하는 트레이드오프를 선택하세요.</p>
+
+      <table>
+        <tr><th>엔진</th><th>특징</th><th>지원 언어</th><th>적합한 용도</th></tr>
+        <tr><td><strong>Qwen TTS</strong></td><td>범용 기본 엔진, 크로스페이드·문장 재생성 지원</td><td>10개 (한중일·영어·유럽 등)</td><td>일반 텍스트 합성</td></tr>
+        <tr><td><strong>Qwen CustomVoice</strong></td><td><strong>전달 지시사항</strong> 지원 — 감정·속도·톤을 문장으로 지시</td><td>10개</td><td>감정/톤 조절이 필요한 내레이션</td></tr>
+        <tr><td><strong>Supertonic</strong></td><td>가장 넓은 다국어(31개), 프리셋 음성 다양</td><td>31개 (중동·인도·동유럽 포함)</td><td>다국어 콘텐츠, 다양한 성격의 목소리</td></tr>
+      </table>
+
+      <h2>전달 지시사항 (Qwen CustomVoice 전용)</h2>
+      <p>생성 박스에서 엔진을 <strong>Qwen CustomVoice</strong>로 선택하면 <strong>전달 지시사항 보기</strong> 입력란이 열립니다. 최대 500자로 감정·속도·톤을 자연어로 지시할 수 있습니다.</p>
+      <ul>
+        <li>감정: <em>"매우 신나고 들뜬 어조로"</em>, <em>"차분하고 엄숙한 분위기로"</em></li>
+        <li>속도: <em>"평소보다 천천히, 단어 사이를 또렷하게"</em></li>
+        <li>톤: <em>"부드럽고 다정하게"</em>, <em>"신비롭고 낮은 목소리로"</em></li>
+        <li>조합: <em>"위급한 상황처럼 빠르고 긴박하게, 마지막 문장은 천천히 강조"</em></li>
+      </ul>
+
+      <div class="note">지시 문구는 구체적일수록 잘 반영됩니다. 결과가 마음에 안 들면 지시를 바꾸거나 <a href="#repaint">문장 단위 재생성</a>으로 해당 문장만 교정하세요.</div>
+    `,
+  },
+  {
+    id: "voice-cloning",
+    label: "보이스 클로닝",
+    group: "핵심 기능",
+    html: `
+      <h1>보이스 클로닝</h1>
+      <p class="lead">30초 샘플 하나와 참조 텍스트로 내 목소리를 복제합니다.</p>
+
+      <h2>고품질 음성 규격</h2>
+      <table>
+        <tr><th>항목</th><th>권장 기준</th></tr>
+        <tr><td>길이</td><td>10~30초 (30초짜리 1개가 가장 적합)</td></tr>
+        <tr><td>파일 형식</td><td>wav · mp3 · m4a 등 원음 (배경음·효과음 제거)</td></tr>
+        <tr><td>화자</td><td>한 사람의 목소리만 (음성 중첩 금지)</td></tr>
+        <tr><td>환경</td><td>조용한 실내 · 마이크 거리 일정 · 자연스러운 톤</td></tr>
+        <tr><td>참조 텍스트</td><td>샘플에서 들리는 내용과 정확히 일치 (변환 버튼으로 자동 입력 가능)</td></tr>
+      </table>
+
+      <h2>단계</h2>
+      <div class="step"><span class="num">1</span><div><h4>샘플 준비</h4><p>조용한 환경에서 30초 내외의 목소리 샘플을 녹음합니다.</p></div></div>
+      <div class="step"><span class="num">2</span><div><h4>새 음성</h4><p>대시보드의 <strong>음성 만들기</strong> 또는 음성 탭의 <strong>새 음성</strong>을 클릭합니다.</p></div></div>
+      <div class="step"><span class="num">3</span><div><h4>소스 선택</h4><p><strong>오디오에서 복제</strong>를 클릭합니다. (내장 음성을 원하면 <strong>내장 음성</strong> 선택)</p></div></div>
+      <div class="step"><span class="num">4</span><div><h4>샘플 등록</h4><p>업로드·녹음·시스템 오디오 중 하나로 규격에 맞는 샘플을 등록합니다.</p></div></div>
+      <div class="step"><span class="num">5</span><div><h4>참조 텍스트</h4><p>샘플에서 들리는 내용을 1~1000자로 입력하거나 <strong>변환</strong> 버튼으로 자동 채웁니다.</p></div></div>
+      <div class="step"><span class="num">6</span><div><h4>프로필 저장</h4><p>이름(필수)·설명·언어·기본 엔진·기본 효과·성격을 입력하고 <strong>프로필 만들기</strong>를 누릅니다.</p></div></div>
+      <div class="step"><span class="num">7</span><div><h4>첫 음성 생성</h4><p>새 프로필 카드를 선택하고 텍스트를 입력한 뒤 <strong>음성 생성</strong>을 누릅니다.</p></div></div>
+
+      <div class="note"><strong>프로필 가져오기/내보내기:</strong> 음성 탭에서 <code>.voicebox.zip</code> 파일로 프로필을 백업·공유할 수 있습니다.</div>
+    `,
+  },
+  {
+    id: "repaint",
+    label: "문장 단위 재생성",
+    group: "핵심 기능",
+    html: `
+      <h1>문장 단위 재생성 (Repaint)</h1>
+      <p class="lead">전체를 다시 돌리지 않고 잘못된 문장만 교정합니다.</p>
+
+      <div class="step"><span class="num">1</span><div><h4>생성물 재생</h4><p>히스토리에서 생성물을 클릭하면 웨이브폼 위에 문장 단위 청크 마커가 표시됩니다.</p></div></div>
+      <div class="step"><span class="num">2</span><div><h4>문장 선택</h4><p>수정할 문장 칩(번호)을 클릭하면 편집 패널이 열립니다.</p></div></div>
+      <div class="step"><span class="num">3</span><div><h4>텍스트 수정</h4><p>발음 교정·오타 수정을 위해 문장을 수정합니다. 같은 시드를 쓰면 비슷한 톤을 유지합니다.</p></div></div>
+      <div class="step"><span class="num">4</span><div><h4>구간 재생성</h4><p><strong>구간 재생성</strong>을 누르면 해당 구간만 다시 생성되어 병합·자동 재생됩니다.</p></div></div>
+    `,
+  },
+  {
+    id: "long-text",
+    label: "장문 텍스트 생성",
+    group: "핵심 기능",
+    html: `
+      <h1>장문 텍스트 생성</h1>
+      <p class="lead">책·기사·대본을 한 번에 생성하고 다듬습니다.</p>
+
+      <table>
+        <tr><th>항목</th><th>기준</th></tr>
+        <tr><td>1회 입력 한도</td><td>최대 50,000자</td></tr>
+        <tr><td>청크 분할</td><td>문장 단위 800자 기본 (설정에서 100~5,000자 조절)</td></tr>
+        <tr><td>병합</td><td>크로스페이드(기본 50ms)로 자연스럽게 이어붙임</td></tr>
+      </table>
+
+      <div class="step"><span class="num">1</span><div><h4>긴 텍스트 입력</h4><p>생성 박스에 긴 텍스트를 붙여넣습니다(최대 50,000자). 문단·문장이 자연스럽게 나뉘어 있으면 분할 품질이 좋습니다.</p></div></div>
+      <div class="step"><span class="num">2</span><div><h4>자동 분할·생성</h4><p>앱이 문장 경계에서 청크를 나누고 순서대로 생성해 크로스페이드로 병합합니다.</p></div></div>
+      <div class="step"><span class="num">3</span><div><h4>분할 기준 조절</h4><p>설정 &gt; 생성 &gt; <strong>자동 청크 분할 한도</strong>에서 조절합니다. 낮출수록 짧은 단위 생성으로 장문 품질이 좋아지지만 시간이 늘어납니다.</p></div></div>
+      <div class="step"><span class="num">4</span><div><h4>부분 수정</h4><p>문장 마커를 클릭하고 <a href="#repaint">구간 재생성</a>으로 특정 문장만 다시 생성합니다.</p></div></div>
+    `,
+  },
+  {
+    id: "vc",
+    label: "음성 변환 (RVC)",
+    group: "핵심 기능",
+    html: `
+      <h1>RVC 음성 변환</h1>
+      <p class="lead">녹음된 음성을 훈련된 모델의 목소리로 변환합니다.</p>
+
+      <div class="step"><span class="num">1</span><div><h4>훈련 시작</h4><p><strong>음성 변환</strong> 탭에서 모델 이름을 입력하고 데이터셋 오디오를 선택합니다(wav/mp3, 다중 선택). 목소리가 풍부한 5분 이상 자료 권장.</p></div></div>
+      <div class="step"><span class="num">2</span><div><h4>훈련 옵션</h4><p>샘플레이트(32/40/48kHz), F0 방식(rmvpe 권장), 에폭(기본 100), 배치 크기(기본 4)를 설정합니다.</p></div></div>
+      <div class="step"><span class="num">3</span><div><h4>훈련 실행</h4><p><strong>훈련 시작</strong>을 누르고 완료되면 모델 상태가 <strong>준비됨</strong>으로 바뀝니다.</p></div></div>
+      <div class="step"><span class="num">4</span><div><h4>변환</h4><p>변환 패널에서 모델을 선택하고, 원본 오디오·인덱스 비율(기본 0.75)·피치 변환(기본 0, +12 = 한 옥타브 높임)을 조정 후 <strong>변환</strong>을 누릅니다.</p></div></div>
+      <div class="step"><span class="num">5</span><div><h4>확인</h4><p>완료 후 <strong>결과 듣기</strong>로 변환된 음성을 확인합니다.</p></div></div>
+    `,
+  },
+  {
+    id: "stories",
+    label: "스토리",
+    group: "핵심 기능",
+    html: `
+      <h1>스토리</h1>
+      <p class="lead">여러 음성 프로필을 캐릭터별로 배정해 대화형 오디오 스토리를 만듭니다.</p>
+      <div class="step"><span class="num">1</span><div><h4>트랙 구성</h4><p>각 트랙에 캐릭터 음성 프로필을 배정합니다.</p></div></div>
+      <div class="step"><span class="num">2</span><div><h4>내레이션</h4><p>설명자(내레이션) 트랙을 추가해 이야기 흐름을 잡습니다.</p></div></div>
+      <div class="step"><span class="num">3</span><div><h4>편집</h4><p>트랙 순서와 각 대사를 편집하고, 미리 듣기로 확인합니다.</p></div></div>
+      <div class="note">팟캐스트·대화·내레이션 등 다자간 콘텐츠에 적합합니다.</div>
+    `,
+  },
+  {
+    id: "captures",
+    label: "캡처 & 받아쓰기",
+    group: "핵심 기능",
+    html: `
+      <h1>캡처 &amp; 받아쓰기</h1>
+      <p class="lead">단축키로 오디오를 캡처하고 받아쓰기/전사로 텍스트로 변환합니다.</p>
+      <div class="step"><span class="num">1</span><div><h4>전역 단축키</h4><p>설정에서 전역 단축키를 길게 눌러 어디서든 녹음을 시작하고, 놓으면 변환됩니다.</p></div></div>
+      <div class="step"><span class="num">2</span><div><h4>캡처 탭</h4><p>캡처된 오디오와 전사본(트랜스크립트)이 함께 저장됩니다. 재전사·정제·음성으로 재생이 가능합니다.</p></div></div>
+      <div class="step"><span class="num">3</span><div><h4>음성으로 재생</h4><p>전사본을 저장된 음성 프로필로 다시 합성해 다른 목소리로 들을 수 있습니다.</p></div></div>
+    `,
+  },
+  {
+    id: "effects",
+    label: "오디오 효과",
+    group: "핵심 기능",
+    html: `
+      <h1>오디오 효과</h1>
+      <p class="lead">생성된 오디오에 리버브·이퀄라이저 등의 효과를 적용하고 프리셋으로 저장합니다.</p>
+      <ul>
+        <li><strong>출력 형식 자동 변환</strong> — 원본(WAV) · 방송용(EBU R128) · CD(44.1kHz/16bit) · MP3</li>
+        <li><strong>프리셋 저장</strong> — 자주 쓰는 효과 조합을 프리셋으로 재사용</li>
+        <li><strong>프로필 기본 효과</strong> — 음성 프로필별 기본 효과를 지정해 일관된 사운드 유지</li>
+      </ul>
+    `,
+  },
+  {
+    id: "models",
+    label: "모델 관리",
+    group: "설정 & 관리",
+    html: `
+      <h1>모델 관리</h1>
+      <p class="lead">TTS·음성 변환·언어 모델을 다운로드하고 관리합니다.</p>
+      <div class="step"><span class="num">1</span><div><h4>모델 탭</h4><p><strong>모델</strong> 탭에서 음성 생성(Qwen·Supertonic), 변환(Whisper), 언어 모델(Qwen3 LLM)을 확인합니다.</p></div></div>
+      <div class="step"><span class="num">2</span><div><h4>다운로드</h4><p>모델이 아직 없으면 해당 행에서 <strong>다운로드</strong>를 눌러 받습니다. 최초 실행 시 자동으로 안내됩니다.</p></div></div>
+      <div class="step"><span class="num">3</span><div><h4>GPU 가속 확인</h4><p>설정 &gt; GPU에서 CUDA/DirectML/MLX 가속 여부를 확인할 수 있습니다.</p></div></div>
+      <div class="note"><strong>저장 위치:</strong> 모델·프로필·생성물은 앱 데이터 폴더에 저장되며, 각 설정 탭에서 <strong>열기</strong> 버튼으로 폴더를 바로 열 수 있습니다.</div>
+    `,
+  },
+  {
+    id: "settings",
+    label: "설정",
+    group: "설정 & 관리",
+    html: `
+      <h1>설정</h1>
+      <table>
+        <tr><th>탭</th><th>내용</th></tr>
+        <tr><td><strong>일반</strong></td><td>서버 URL, 서버 유지, 언어, 테마, 업데이트, API 레퍼런스</td></tr>
+        <tr><td><strong>생성</strong></td><td>자동 청크 분할 한도(100~5,000자), 크로스페이드(0~200ms), 오디오 노멀라이즈, 자동 재생, 생성물 폴더</td></tr>
+        <tr><td><strong>캡처</strong></td><td>받아쓰기 단축키·푸시투톡 설정</td></tr>
+        <tr><td><strong>MCP</strong></td><td>MCP 서버 연결 관리</td></tr>
+        <tr><td><strong>GPU</strong></td><td>GPU 가속 상태 (Tauri 데스크톱 앱에서 표시)</td></tr>
+        <tr><td><strong>로그 / 변경 내역</strong></td><td>서버 로그와 버전별 변경 사항</td></tr>
+        <tr><td><strong>정보</strong></td><td>버전, 라이선스(MIT), 제작자 — 원작: Jamie Pine / 커스텀 빌드: Elijah</td></tr>
+      </table>
+    `,
+  },
+  {
+    id: "api-mcp",
+    label: "API & MCP",
+    group: "개발자",
+    html: `
+      <h1>API &amp; MCP</h1>
+      <p class="lead">REST API로 음성을 합성하고, MCP 에이전트가 음성으로 말하게 합니다.</p>
+
+      <h2>주요 엔드포인트</h2>
+      <table>
+        <tr><th>메서드</th><th>경로</th><th>용도</th></tr>
+        <tr><td>POST</td><td><code>/generate</code></td><td>음성 합성</td></tr>
+        <tr><td>GET</td><td><code>/health</code></td><td>서버 상태</td></tr>
+        <tr><td>GET</td><td><code>/profiles</code></td><td>음성 프로필 목록</td></tr>
+        <tr><td>GET</td><td><code>/history</code></td><td>생성 이력</td></tr>
+      </table>
+      <p>전체 스펙은 설정 &gt; 일반의 <strong>API 레퍼런스 보기</strong>(<code>/docs</code>)에서 확인합니다.</p>
+
+      <h2>MCP 에이전트 연동</h2>
+      <p>설정 &gt; MCP 탭에서 서버를 연결하면, Claude Code 등 MCP 인지 에이전트가 <code>speak</code>/<code>transcribe</code> 도구로 복제한 목소리로 말할 수 있습니다.</p>
+    `,
+  },
+  {
+    id: "troubleshooting",
+    label: "문제 해결",
+    group: "개발자",
+    html: `
+      <h1>문제 해결</h1>
+
+      <h3>음성이 생성되지 않아요</h3>
+      <ul>
+        <li><strong>모델 다운로드</strong> — 모델 탭에서 Qwen TTS 등 필요한 모델이 <strong>로드됨</strong> 상태인지 확인하세요. 최초 사용 시 다운로드가 필요합니다.</li>
+        <li><strong>서버 연결</strong> — 설정 &gt; 일반의 서버 URL이 <code>http://127.0.0.1:17493</code>인지, 연결 상태가 <strong>온라인</strong>인지 확인하세요.</li>
+        <li><strong>GPU 부족</strong> — VRAM이 부족하면 CPU로 대체됩니다. 설정 &gt; GPU에서 상태를 확인하세요.</li>
+      </ul>
+
+      <h3>복제 품질이 낮아요</h3>
+      <ul>
+        <li>샘플이 10~30초, 한 화자, 배경음 없는 원음인지 확인하세요.</li>
+        <li>참조 텍스트가 샘플 내용과 <strong>정확히</strong> 일치하는지 확인하세요.</li>
+        <li>음성 중첩·효과음이 섞이면 품질이 떨어집니다.</li>
+      </ul>
+
+      <h3>장문 생성이 중간에 끊겨요</h3>
+      <ul>
+        <li>설정 &gt; 생성에서 <strong>자동 청크 분할 한도</strong>를 낮춰 보세요 (청크당 약 500자 이내 권장).</li>
+        <li>크로스페이드(기본 50ms)를 조절해 문장 경계를 자연스럽게 만드세요.</li>
+      </ul>
+
+      <h3>도움이 더 필요하면</h3>
+      <ul>
+        <li>앱 내 <strong>도움말</strong> 메뉴에서 단계별 튜토리얼 5개를 확인하세요.</li>
+        <li>원작 프로젝트: <a href="https://github.com/jamiepine/voicebox">github.com/jamiepine/voicebox</a></li>
+      </ul>
+    `,
+  },
+];
+
+// ─────────────────────────────────────────────────────────────
+// 렌더링 로직 (보통은 건드릴 필요가 없습니다)
+// ─────────────────────────────────────────────────────────────
+const nav = document.getElementById("nav");
+const content = document.getElementById("content");
+const groups = {};
+for (const s of SECTIONS) { (groups[s.group] ||= []).push(s); }
+
+for (const [group, items] of Object.entries(groups)) {
+  const lbl = document.createElement("div");
+  lbl.className = "group-label"; lbl.textContent = group;
+  nav.appendChild(lbl);
+  for (const item of items) {
+    const a = document.createElement("a");
+    a.textContent = item.label;
+    a.href = "#" + item.id;
+    a.dataset.id = item.id;
+    a.addEventListener("click", (e) => { e.preventDefault(); show(item.id); });
+    nav.appendChild(a);
+  }
+}
+
+function show(id) {
+  content.innerHTML = "";
+  for (const s of SECTIONS) {
+    const div = document.createElement("section");
+    div.className = "section" + (s.id === id ? " active" : "");
+    div.id = "sec-" + s.id;
+    div.innerHTML = s.html;
+    content.appendChild(div);
+  }
+  document.querySelectorAll("nav a").forEach((a) => a.classList.toggle("active", a.dataset.id === id));
+  window.scrollTo({ top: 0 });
+}
+
+// 검색
+const search = document.getElementById("search");
+search.addEventListener("input", () => {
+  const q = search.value.trim().toLowerCase();
+  document.querySelectorAll("nav a").forEach((a) => {
+    const s = SECTIONS.find((x) => x.id === a.dataset.id);
+    const hay = (s.label + " " + s.html).toLowerCase();
+    a.style.display = hay.includes(q) ? "" : "none";
+  });
+});
+
+// 테마
+const themeToggle = document.getElementById("themeToggle");
+const saved = localStorage.getItem("vb-manual-theme") || "dark";
+document.documentElement.setAttribute("data-theme", saved);
+themeToggle.addEventListener("click", () => {
+  const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  localStorage.setItem("vb-manual-theme", next);
+});
+
+// Ctrl+K → 검색 포커스
+document.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); search.focus(); }
+});
+
+// 초기 로드 — 해시 기반 섹션
+show(window.location.hash.slice(1) || SECTIONS[0].id);
+</script>
+</body>
+</html>

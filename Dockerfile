@@ -92,6 +92,9 @@ COPY --chown=voicebox:voicebox backend/ /app/backend/
 # Copy built frontend from frontend stage
 COPY --from=frontend --chown=voicebox:voicebox /build/web/dist /app/frontend/
 
+# Copy user-editable HTML manual (served at /manual)
+COPY --chown=voicebox:voicebox manual/ /app/manual/
+
 # Create data directories owned by non-root user
 RUN mkdir -p /app/data/generations /app/data/profiles /app/data/cache \
     && chown -R voicebox:voicebox /app/data

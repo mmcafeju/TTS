@@ -949,7 +949,8 @@
     },
     "general": {
       "docs": {
-        "title": "Read the Docs"
+        "title": "Read the Docs",
+        "subtitle": "Local user manual"
       },
       "discord": {
         "title": "Join the Discord",
@@ -1058,8 +1059,8 @@
           "body": "A few seconds of reference audio is enough. Multi-sample support for higher quality when you want it."
         },
         "engines": {
-          "title": "Seven engines, 23 languages.",
-          "body": "Pick the tradeoff that fits — quality, speed, or multilingual coverage."
+          "title": "3 engines, 32 languages.",
+          "body": "Pick the tradeoff that fits — quality, speed, or multilingual coverage. (Qwen TTS · Qwen CustomVoice · Supertonic)"
         },
         "agentReady": {
           "title": "Agent-ready.",
@@ -1364,6 +1365,7 @@
     "about": {
       "tagline": "The open-source voice synthesis studio. Clone voices, generate speech, apply effects, and build voice-powered apps — all running locally on your machine.",
       "createdBy": "Created by",
+      "customBuild": "Custom Build",
       "buyCoffee": "Buy me a coffee",
       "license": "Licensed under <link>MIT</link>"
     }

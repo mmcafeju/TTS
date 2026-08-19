@@ -74,6 +74,8 @@ export function AboutPage() {
               >
                 Jamie Pine
               </a>
+              <span className="text-muted-foreground/40">·</span>
+              <span className="text-accent">{t('settings.about.customBuild')} — Elijah</span>
             </div>
           </FadeIn>
 
