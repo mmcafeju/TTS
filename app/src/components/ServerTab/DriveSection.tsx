@@ -64,12 +64,19 @@ export function DriveSection() {
         description: t('settings.general.drive.loginContinueDescription'),
       });
     },
-    onError: (error: Error) =>
+    onError: (error: Error) => {
+      const notConfigured =
+        /GOOGLE_CLIENT_ID is not configured|not configured/i.test(error.message);
       toast({
-        title: t('settings.general.drive.loginFailedTitle'),
-        description: error.message,
+        title: notConfigured
+          ? t('settings.general.drive.notConfiguredTitle')
+          : t('settings.general.drive.loginFailedTitle'),
+        description: notConfigured
+          ? t('settings.general.drive.notConfiguredDescription')
+          : error.message,
         variant: 'destructive',
-      }),
+      });
+    },
   });
 
   const backup = useMutation({

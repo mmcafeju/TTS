@@ -964,6 +964,8 @@
         "loginContinueTitle": "브라우저에서 계속",
         "loginContinueDescription": "Google로 로그인한 뒤 이 화면으로 돌아오세요.",
         "loginFailedTitle": "로그인을 시작할 수 없습니다",
+        "notConfiguredTitle": "Google 자격증명이 필요합니다",
+        "notConfiguredDescription": "Google Cloud Console에서 OAuth 클라이언트를 발급받아 data/google_drive.json에 저장하세요. 자세한 방법은 매뉴얼의 'Google Drive 연동 설정' 섹션을 참고하세요.",
         "loginTimedOutTitle": "로그인 시간 초과",
         "loginTimedOutDescription": "Google 로그인이 완료되지 않았습니다. 다시 시도하세요.",
         "loginWaiting": "브라우저 대기 중…",

@@ -964,6 +964,8 @@
         "loginContinueTitle": "Continue in your browser",
         "loginContinueDescription": "Sign in with Google, then return here.",
         "loginFailedTitle": "Could not start sign-in",
+        "notConfiguredTitle": "Google credentials required",
+        "notConfiguredDescription": "Create an OAuth client in Google Cloud Console and save it to data/google_drive.json. See the 'Google Drive setup' section in the manual.",
         "loginTimedOutTitle": "Sign-in timed out",
         "loginTimedOutDescription": "The Google sign-in was not completed. Try again.",
         "loginWaiting": "Waiting for browser…",
