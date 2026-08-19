@@ -227,6 +227,71 @@ def test_run_backup_not_connected(test_db):
     assert result["uploaded"] == 0
 
 
+def test_callback_rejects_bad_state(test_db):
+    ok, msg = _run_async(drive_service.handle_callback(test_db, code="abc", state="bogus"))
+    assert ok is False
+    assert "invalid or has expired" in msg
+
+
+def test_callback_missing_code(test_db, mock_creds):
+    drive_service.start_login("http://127.0.0.1:17493/drive/callback", "test-pc")
+    state = list(drive_service._pending.keys())[0]
+    ok, msg = _run_async(drive_service.handle_callback(test_db, code="", state=state))
+    assert ok is False
+    assert "Missing authorization code" in msg
+
+
+def test_callback_token_exchange_and_store(test_db, mock_creds):
+    url = drive_service.start_login("http://127.0.0.1:17493/drive/callback", "test-pc")
+    state = url.split("state=")[1].split("&")[0]
+
+    async def fake_post(url, *args, **kwargs):
+        assert "oauth2.googleapis.com/token" in url
+        return _mock_json_response(
+            {
+                "refresh_token": "REFRESH",
+                "access_token": "ACCESS",
+                "expires_in": 3600,
+            }
+        )
+
+    async def fake_get(url, *args, **kwargs):
+        assert "www.googleapis.com/drive/v3/about" in url
+        return _mock_json_response({"user": {"emailAddress": "me@example.com"}})
+
+    with patch("httpx.AsyncClient") as mock_client_cls:
+        instance = mock_client_cls.return_value
+        instance.__aenter__ = AsyncMock(return_value=instance)
+        instance.__aexit__ = AsyncMock(return_value=False)
+        instance.post = fake_post
+        instance.get = fake_get
+        ok, msg = _run_async(drive_service.handle_callback(test_db, code="auth-code", state=state))
+
+    assert ok is True
+    status = drive_service.get_status(test_db)
+    assert status["connected"] is True
+    assert status["account_email"] == "me@example.com"
+
+
+def test_callback_google_rejects(test_db, mock_creds):
+    url = drive_service.start_login("http://127.0.0.1:17493/drive/callback", "test-pc")
+    state = url.split("state=")[1].split("&")[0]
+
+    async def fake_post(url, *args, **kwargs):
+        return _mock_json_response({"error": "invalid_grant"}, status=400)
+
+    with patch("httpx.AsyncClient") as mock_client_cls:
+        instance = mock_client_cls.return_value
+        instance.__aenter__ = AsyncMock(return_value=instance)
+        instance.__aexit__ = AsyncMock(return_value=False)
+        instance.post = fake_post
+        ok, msg = _run_async(drive_service.handle_callback(test_db, code="bad", state=state))
+
+    assert ok is False
+    assert "rejected the sign-in code" in msg
+    assert drive_service.get_status(test_db)["connected"] is False
+
+
 def test_run_backup_mirrors_folders(test_db, tmp_path):
     captures = tmp_path / "captures"
     generations = tmp_path / "generations"
