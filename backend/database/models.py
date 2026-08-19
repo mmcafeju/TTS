@@ -261,6 +261,29 @@ class CloudSettings(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
+class DriveSettings(Base):
+    """Singleton row holding the Google Drive backup link.
+
+    Stores the Google OAuth refresh token (and a short-lived access token cache)
+    plus the id of the ``voicebox`` folder we created in Drive. The refresh
+    token is the durable credential: it lets the backend mint access tokens and
+    back up captures/generations without re-authorizing. ``id`` is always 1; a
+    null ``refresh_token`` means "not connected".
+    """
+
+    __tablename__ = "drive_settings"
+
+    id = Column(Integer, primary_key=True, default=1)
+    refresh_token = Column(String, nullable=True)
+    access_token = Column(String, nullable=True)
+    token_expires_at = Column(DateTime, nullable=True)
+    account_email = Column(String, nullable=True)
+    root_folder_id = Column(String, nullable=True)
+    connected_at = Column(DateTime, nullable=True)
+    last_backup_at = Column(DateTime, nullable=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
 class MCPClientBinding(Base):
     """Per-MCP-client settings (voice profile, engine, personality default).
 

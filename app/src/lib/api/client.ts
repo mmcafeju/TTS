@@ -52,8 +52,9 @@ import type {
   MCPClientBinding,
   MCPClientBindingListResponse,
   MCPClientBindingUpsert,
-  CloudLoginStartResponse,
-  CloudStatus,
+  DriveLoginStartResponse,
+  DriveStatus,
+  DriveBackupResponse,
   VCConvertRequest,
   VCJobResponse,
   VCModelResponse,
@@ -962,19 +963,24 @@ class ApiClient {
     return response.blob();
   }
 
-  // Cloud (backup & sync) — browser-based device login. startCloudLogin opens
-  // the system browser server-side; the UI then polls getCloudStatus until the
-  // backend completes the exchange and the link goes live.
-  async getCloudStatus(): Promise<CloudStatus> {
-    return this.request<CloudStatus>('/cloud/status');
+  // Google Drive backup — browser-based OAuth login. startDriveLogin opens
+  // the system browser (using whatever Google account is already signed in);
+  // the UI then polls getDriveStatus until the backend completes the exchange
+  // and the link goes live. Back up with runDriveBackup.
+  async getDriveStatus(): Promise<DriveStatus> {
+    return this.request<DriveStatus>('/drive/status');
   }
 
-  async startCloudLogin(): Promise<CloudLoginStartResponse> {
-    return this.request<CloudLoginStartResponse>('/cloud/login/start', { method: 'POST' });
+  async startDriveLogin(): Promise<DriveLoginStartResponse> {
+    return this.request<DriveLoginStartResponse>('/drive/login/start', { method: 'POST' });
   }
 
-  async disconnectCloud(): Promise<CloudStatus> {
-    return this.request<CloudStatus>('/cloud/disconnect', { method: 'POST' });
+  async runDriveBackup(): Promise<DriveBackupResponse> {
+    return this.request<DriveBackupResponse>('/drive/backup', { method: 'POST' });
+  }
+
+  async disconnectDrive(): Promise<DriveStatus> {
+    return this.request<DriveStatus>('/drive/disconnect', { method: 'POST' });
   }
 
   // ── Voice Conversion (RVC) ──────────────────────────────────────────

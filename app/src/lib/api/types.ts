@@ -559,19 +559,25 @@ export interface MCPClientBindingListResponse {
   items: MCPClientBinding[];
 }
 
-/* ─── Cloud (backup & sync) ───────────────────────────────────────────── */
+/* ─── Google Drive backup ──────────────────────────────────────────────── */
 
-export interface CloudLoginStartResponse {
+export interface DriveLoginStartResponse {
   authorize_url: string;
 }
 
-export interface CloudStatus {
+export interface DriveStatus {
   connected: boolean;
-  device_name: string | null;
-  account_user_id: string | null;
-  key_prefix: string | null;
+  account_email: string | null;
   connected_at: string | null;
-  dashboard_url: string;
+  last_backup_at: string | null;
+  folder_name: string | null;
+}
+
+export interface DriveBackupResponse {
+  success: boolean;
+  message: string;
+  uploaded: number;
+  skipped: number;
 }
 
 /* ─── Voice Conversion (RVC) ──────────────────────────────────────────── */

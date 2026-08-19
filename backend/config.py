@@ -229,3 +229,35 @@ def get_cloud_web_url() -> str:
 def get_cloud_api_url() -> str:
     """Base URL of the Voicebox Cloud API (bearer-authenticated sync/account)."""
     return os.environ.get("VOICEBOX_CLOUD_API_URL", "https://api.voicebox.sh").rstrip("/")
+
+
+# Google Drive backup. Credentials come from either environment variables
+# (GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET) or a JSON file kept next to the
+# app data (data/google_drive.json) with {"client_id": ..., "client_secret": ...}.
+# The file is the "set once, keep working" path — fill it in once and the app
+# stores the refresh token afterwards, so no re-auth is ever needed.
+def get_google_credentials() -> tuple[str | None, str | None]:
+    """Return (client_id, client_secret) for Google OAuth, or (None, None)."""
+    client_id = os.environ.get("GOOGLE_CLIENT_ID")
+    client_secret = os.environ.get("GOOGLE_CLIENT_SECRET")
+    if client_id and client_secret:
+        return client_id, client_secret
+
+    creds_file = _data_dir / "google_drive.json"
+    if creds_file.is_file():
+        try:
+            import json as _json
+
+            payload = _json.loads(creds_file.read_text(encoding="utf-8"))
+            client_id = payload.get("client_id")
+            client_secret = payload.get("client_secret")
+            return client_id, client_secret
+        except Exception:
+            logger.exception("failed to read %s", creds_file)
+
+    return None, None
+
+
+def get_google_credentials_file() -> Path:
+    """Path to the JSON credentials file users fill in once."""
+    return _data_dir / "google_drive.json"

@@ -853,6 +853,35 @@ class CloudStatusResponse(BaseModel):
     dashboard_url: str
 
 
+# ——— Google Drive backup ———
+
+
+class DriveLoginStartResponse(BaseModel):
+    """Returned when the desktop kicks off Google Drive OAuth. The backend has
+    already opened the browser; the URL is included for fallback/debugging."""
+
+    authorize_url: str
+
+
+class DriveStatusResponse(BaseModel):
+    """Current link between this device and a Google Drive account."""
+
+    connected: bool
+    account_email: Optional[str] = None
+    connected_at: Optional[datetime] = None
+    last_backup_at: Optional[datetime] = None
+    folder_name: Optional[str] = None
+
+
+class DriveBackupResponse(BaseModel):
+    """Result of a manual backup run."""
+
+    success: bool
+    message: str
+    uploaded: int = 0
+    skipped: int = 0
+
+
 # ——— Voice Conversion (RVC) ———
 
 

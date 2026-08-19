@@ -337,7 +337,7 @@ const SECTIONS = [
       <h1>설정</h1>
       <table>
         <tr><th>탭</th><th>내용</th></tr>
-        <tr><td><strong>일반</strong></td><td>서버 URL, 서버 유지, 언어, 테마, 업데이트, API 레퍼런스</td></tr>
+        <tr><td><strong>일반</strong></td><td>서버 URL, 서버 유지, 언어, 테마, Google Drive 백업, API 레퍼런스</td></tr>
         <tr><td><strong>생성</strong></td><td>자동 청크 분할 한도(100~5,000자), 크로스페이드(0~200ms), 오디오 노멀라이즈, 자동 재생, 생성물 폴더</td></tr>
         <tr><td><strong>캡처</strong></td><td>받아쓰기 단축키·푸시투톡 설정</td></tr>
         <tr><td><strong>MCP</strong></td><td>MCP 서버 연결 관리</td></tr>
@@ -345,6 +345,46 @@ const SECTIONS = [
         <tr><td><strong>로그 / 변경 내역</strong></td><td>서버 로그와 버전별 변경 사항</td></tr>
         <tr><td><strong>정보</strong></td><td>버전, 라이선스(MIT), 제작자 — 원작: Jamie Pine / 커스텀 빌드: Elijah</td></tr>
       </table>
+
+      <h2>Google Drive 백업</h2>
+      <p>캡처와 생성물을 내 Google Drive의 <strong>voicebox</strong> 폴더에 백업합니다. 로그인은 브라우저의 Google 계정을 재사용합니다(이미 로그인된 계정으로 진행되고, 없으면 로그인 화면이 열립니다). 한 번만 설정하면 이후에는 자동으로 계속 사용할 수 있습니다.</p>
+      <h3>첫 번째 설정 (한 번만)</h3>
+      <div class="step"><span class="num">1</span><div><h4>OAuth 자격증명 준비</h4><p><a href="#google-setup">Google Drive 연동 설정</a> 섹션의 안내를 따라 Google Cloud Console에서 OAuth Client ID/Secret을 발급받습니다.</p></div></div>
+      <div class="step"><span class="num">2</span><div><h4>자격증명 저장</h4><p>발급받은 값을 <code>data/google_drive.json</code> 파일(또는 환경변수)에 저장합니다.</p></div></div>
+      <div class="step"><span class="num">3</span><div><h4>Log in with Google Drive</h4><p>설정 &gt; 일반의 <strong>Google Drive 백업</strong> 섹션에서 버튼을 누르면 브라우저가 열립니다. Google 계정을 선택해 승인합니다.</p></div></div>
+      <div class="step"><span class="num">4</span><div><h4>자동 백업 시작</h4><p>연결 후 <strong>지금 백업</strong>을 눌러 첫 백업을 실행합니다. 이후 생성된 캡처·생성물은 같은 voicebox 폴더에 미러링됩니다.</p></div></div>
+    `,
+  },
+  {
+    id: "google-setup",
+    label: "Google Drive 연동 설정",
+    group: "설정 & 관리",
+    html: `
+      <h1>Google Drive 연동 설정</h1>
+      <p class="lead">이 앱은 Google OAuth 2.0으로 Drive에 백업합니다. 자격증명은 앱이 대신 만들 수 없으므로 <strong>한 번만</strong> 아래 절차로 직접 발급받아 저장하면 됩니다.</p>
+
+      <div class="step"><span class="num">1</span><div><h4>Google Cloud Console 열기</h4><p><a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer">console.cloud.google.com</a> — Google 계정으로 로그인합니다.</p></div></div>
+      <div class="step"><span class="num">2</span><div><h4>프로젝트 만들기</h4><p>상단 프로젝트 선택 &gt; <strong>새 프로젝트</strong> (이름 예: voicebox-backup) &gt; 만들기.</p></div></div>
+      <div class="step"><span class="num">3</span><div><h4>OAuth 동의 화면</h4><p>좌측 메뉴 <strong>API 및 서비스</strong> &gt; <strong>OAuth 동의 화면</strong> &gt; User type <strong>외부(External)</strong> &gt; 앱 이름·지원 이메일 입력 &gt; 저장. (테스트 모드여도 됩니다)</p></div></div>
+      <div class="step"><span class="num">4</span><div><h4>Google Drive API 사용 설정</h4><p><strong>라이브러리</strong>에서 <code>Google Drive API</code> 검색 &gt; 사용.</p></div></div>
+      <div class="step"><span class="num">5</span><div><h4>OAuth 클라이언트 만들기</h4><p><strong>OAuth 클라이언트 ID 만들기</strong> &gt; 유형 <strong>데스크톱 앱</strong> &gt; 만들기. <code>Client ID</code>와 <code>Client Secret</code>을 복사합니다.</p></div></div>
+      <div class="step"><span class="num">6</span><div><h4>자격증명 저장</h4><p>앱 데이터 폴더의 <code>data/google_drive.json</code>을 만들고 아래 형식으로 저장합니다.</p></div></div>
+
+      <pre><code>{
+  "client_id": "YOUR_CLIENT_ID.apps.googleusercontent.com",
+  "client_secret": "YOUR_CLIENT_SECRET"
+}</code></pre>
+
+      <div class="note">환경변수를 쓸 수도 있습니다: <code>GOOGLE_CLIENT_ID</code>, <code>GOOGLE_CLIENT_SECRET</code>. 파일이 우선은 아니며, 환경변수가 없을 때 파일을 읽습니다.</div>
+      <div class="warn warn">백업은 <code>https://www.googleapis.com/auth/drive.file</code> 범위만 사용합니다 — 이 앱이 만든 파일에만 접근하며, 다른 Drive 파일은 읽거나 수정하지 않습니다.</div>
+
+      <h2>자주 묻는 질문</h2>
+      <ul>
+        <li><strong>한 번 로그인하면 다시 필요 없나요?</strong> 네. 리프레시 토큰이 저장되어 재인증 없이 계속 백업됩니다.</li>
+        <li><strong>브라우저에 Google 로그인이 안 되어 있으면?</strong> 로그인 화면이 먼저 열립니다. 그 후 계정 선택으로 진행됩니다.</li>
+        <li><strong>권한을 되돌리려면?</strong> 설정에서 <strong>연결 해제</strong>를 누르거나 Google 계정 &gt; 보안 &gt; 타사 앱에서 해지합니다.</li>
+        <li><strong>Client Secret이 앱에 저장되는 게 안전한가요?</strong> 데스크톱 앱에서는 일반적인 방식입니다. 리프레시 토큰은 로컬 DB에만 저장됩니다.</li>
+      </ul>
     `,
   },
   {

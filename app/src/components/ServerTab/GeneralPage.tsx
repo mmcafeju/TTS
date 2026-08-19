@@ -14,7 +14,7 @@ import { useAutoUpdater } from '@/hooks/useAutoUpdater';
 import { useServerHealth } from '@/lib/hooks/useServer';
 import { usePlatform } from '@/platform/PlatformContext';
 import { useServerStore } from '@/stores/serverStore';
-import { CloudSection } from './CloudSection';
+import { DriveSection } from './DriveSection';
 import { LanguageSelect } from './LanguageSelect';
 import { SettingRow, SettingSection } from './SettingRow';
 import { ThemeSelect } from './ThemeSelect';
@@ -210,7 +210,7 @@ export function GeneralPage() {
         />
       </SettingSection>
 
-      <CloudSection />
+      <DriveSection />
 
       <ApiReferenceCard serverUrl={serverUrl} />
 
