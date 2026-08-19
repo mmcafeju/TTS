@@ -54,7 +54,7 @@ export function HelpTab() {
     }
 
     const feature = getHelpFeature(selectedId);
-    return <FeaturePanel featureId={feature.id} />;
+    return <FeaturePanel featureId={feature.id} onOpenTutorial={setSelectedId} />;
   };
 
   return (
@@ -97,7 +97,10 @@ export function HelpTab() {
                 {Icon ? <Icon className="h-4 w-4 shrink-0" /> : null}
                 <span className="truncate">{label}</span>
                 {tutorial ? (
-                  <span className="ml-auto shrink-0 text-[10px] text-muted-foreground/70">
+                  <span className="ml-auto shrink-0 inline-flex items-center gap-1 rounded-full bg-accent/10 px-1.5 py-0.5 text-[10px] font-medium text-accent">
+                    <span className="text-muted-foreground/60">
+                      {t('help.tutorialsSection')}
+                    </span>
                     {tutorial.index}
                   </span>
                 ) : null}
@@ -244,7 +247,13 @@ function OverviewPanel({
   );
 }
 
-function FeaturePanel({ featureId }: { featureId: string }) {
+function FeaturePanel({
+  featureId,
+  onOpenTutorial,
+}: {
+  featureId: string;
+  onOpenTutorial: (id: HelpMenuItemId) => void;
+}) {
   const { t } = useTranslation();
   const feature = getHelpFeature(featureId);
   const tutorial = feature.tutorialId
@@ -265,7 +274,11 @@ function FeaturePanel({ featureId }: { featureId: string }) {
           <h3 className="text-sm font-semibold text-muted-foreground mb-2">
             {t('help.relatedTutorial')}
           </h3>
-          <div className="flex items-center gap-3 rounded-md border border-border px-3 py-2">
+          <button
+            type="button"
+            onClick={() => onOpenTutorial(tutorial.id)}
+            className="flex w-full items-center gap-3 rounded-md border border-border px-3 py-2 text-left transition-colors hover:bg-muted/50"
+          >
             <tutorial.icon className="h-4 w-4 shrink-0 text-accent" />
             <div className="min-w-0">
               <div className="text-sm font-medium">
@@ -276,7 +289,8 @@ function FeaturePanel({ featureId }: { featureId: string }) {
                 {t(tutorial.subtitleKey)}
               </div>
             </div>
-          </div>
+            <ExternalLink className="ml-auto h-4 w-4 shrink-0 text-muted-foreground" />
+          </button>
         </section>
       ) : null}
 
