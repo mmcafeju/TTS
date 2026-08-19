@@ -365,9 +365,9 @@ const SECTIONS = [
 
       <div class="step"><span class="num">1</span><div><h4>Google Cloud Console 열기</h4><p><a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer">console.cloud.google.com</a> — Google 계정으로 로그인합니다.</p></div></div>
       <div class="step"><span class="num">2</span><div><h4>프로젝트 만들기</h4><p>상단 프로젝트 선택 &gt; <strong>새 프로젝트</strong> (이름 예: voicebox-backup) &gt; 만들기.</p></div></div>
-      <div class="step"><span class="num">3</span><div><h4>OAuth 동의 화면</h4><p>좌측 메뉴 <strong>API 및 서비스</strong> &gt; <strong>OAuth 동의 화면</strong> &gt; User type <strong>외부(External)</strong> &gt; 앱 이름·지원 이메일 입력 &gt; 저장. (테스트 모드여도 됩니다)</p></div></div>
+      <div class="step"><span class="num">3</span><div><h4>OAuth 동의 화면</h4><p>좌측 메뉴 <strong>API 및 서비스</strong> &gt; <strong>OAuth 동의 화면</strong> &gt; User type <strong>외부(External)</strong> &gt; 앱 이름·지원 이메일 입력 &gt; 저장. <strong>테스트(Testing) 모드일 때는 반드시</strong> <strong>테스트 사용자(Test users)</strong> 목록에 로그인할 본인 Google 이메일을 추가해야 합니다. 추가하지 않으면 로그인 시 "액세스 차단됨(Access blocked)" 오류가 발생합니다.</p></div></div>
       <div class="step"><span class="num">4</span><div><h4>Google Drive API 사용 설정</h4><p><strong>라이브러리</strong>에서 <code>Google Drive API</code> 검색 &gt; 사용.</p></div></div>
-      <div class="step"><span class="num">5</span><div><h4>OAuth 클라이언트 만들기</h4><p><strong>OAuth 클라이언트 ID 만들기</strong> &gt; 유형 <strong>데스크톱 앱</strong> &gt; 만들기. <code>Client ID</code>와 <code>Client Secret</code>을 복사합니다.</p></div></div>
+      <div class="step"><span class="num">5</span><div><h4>OAuth 클라이언트 만들기</h4><p><strong>OAuth 클라이언트 ID 만들기</strong> &gt; 유형 <strong>데스크톱 앱</strong> &gt; 만들기. <code>Client ID</code>와 <code>Client Secret</code>을 복사합니다. (데스크톱 앱 유형은 루프백 리다이렉트가 기본 허용되므로 리다이렉트 URI 등록이 필요 없습니다)</p></div></div>
       <div class="step"><span class="num">6</span><div><h4>자격증명 저장</h4><p>앱 데이터 폴더의 <code>data/google_drive.json</code>을 만들고 아래 형식으로 저장합니다.</p></div></div>
 
       <pre><code>{
@@ -384,6 +384,8 @@ const SECTIONS = [
         <li><strong>브라우저에 Google 로그인이 안 되어 있으면?</strong> 로그인 화면이 먼저 열립니다. 그 후 계정 선택으로 진행됩니다.</li>
         <li><strong>권한을 되돌리려면?</strong> 설정에서 <strong>연결 해제</strong>를 누르거나 Google 계정 &gt; 보안 &gt; 타사 앱에서 해지합니다.</li>
         <li><strong>Client Secret이 앱에 저장되는 게 안전한가요?</strong> 데스크톱 앱에서는 일반적인 방식입니다. 리프레시 토큰은 로컬 DB에만 저장됩니다.</li>
+        <li><strong>로그인하면 "액세스 차단됨(Access blocked)"이 떠요.</strong> OAuth 동의 화면의 테스트 사용자 목록에 본인 Google 이메일이 추가되어 있는지 확인하세요. 추가 후에는 브라우저 캐시를 지우고 다시 시도합니다.</li>
+        <li><strong>"이 앱은 확인되지 않음" 경고가 나와요.</strong> 테스트 모드에서는 정상입니다. <strong>고급</strong> &gt; <strong>(안전하지 않음)으로 이동</strong>을 눌러 진행하면 됩니다.</li>
       </ul>
     `,
   },
