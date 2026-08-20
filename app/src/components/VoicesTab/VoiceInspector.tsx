@@ -80,7 +80,7 @@ export function VoiceInspector({ profileId }: VoiceInspectorProps) {
     defaultValues: {
       name: '',
       description: '',
-      language: 'en',
+      language: 'ko',
     },
   });
 

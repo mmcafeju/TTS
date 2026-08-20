@@ -55,7 +55,7 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
     resolver: zodResolver(generationSchema),
     defaultValues: {
       text: '',
-      language: 'en',
+      language: 'ko',
       seed: undefined,
       modelSize: '1.7B',
       instruct: '',

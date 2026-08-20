@@ -53,7 +53,7 @@ export function applyEngineSelection(form: UseFormReturn<GenerationFormValues>, 
     const currentLang = form.getValues('language');
     const available = getLanguageOptionsForEngine('qwen_custom_voice');
     if (!available.some((l) => l.value === currentLang)) {
-      form.setValue('language', available[0]?.value ?? 'en');
+      form.setValue('language', available[0]?.value ?? 'ko');
     }
   } else if (value.startsWith('qwen:')) {
     const [, modelSize] = value.split(':');
@@ -63,7 +63,7 @@ export function applyEngineSelection(form: UseFormReturn<GenerationFormValues>, 
     const currentLang = form.getValues('language');
     const available = getLanguageOptionsForEngine('qwen');
     if (!available.some((l) => l.value === currentLang)) {
-      form.setValue('language', available[0]?.value ?? 'en');
+      form.setValue('language', available[0]?.value ?? 'ko');
     }
   } else {
     form.setValue('engine', value as GenerationFormValues['engine']);
@@ -75,7 +75,7 @@ export function applyEngineSelection(form: UseFormReturn<GenerationFormValues>, 
       const currentLang = form.getValues('language');
       const available = getLanguageOptionsForEngine(value);
       if (!available.some((l) => l.value === currentLang)) {
-        form.setValue('language', available[0]?.value ?? 'en');
+        form.setValue('language', available[0]?.value ?? 'ko');
       }
     }
   }

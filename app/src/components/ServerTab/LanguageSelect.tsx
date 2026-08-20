@@ -10,7 +10,7 @@ import { type LanguageCode, SUPPORTED_LANGUAGES } from '@/i18n';
 
 export function LanguageSelect() {
   const { i18n } = useTranslation();
-  const current = SUPPORTED_LANGUAGES.find((l) => l.code === i18n.language)?.code ?? 'en';
+  const current = SUPPORTED_LANGUAGES.find((l) => l.code === i18n.language)?.code ?? 'ko';
 
   return (
     <Select

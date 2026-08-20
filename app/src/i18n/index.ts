@@ -40,7 +40,7 @@ i18n
       fr: { translation: fr },
       it: { translation: it },
     },
-    fallbackLng: 'en',
+    fallbackLng: 'ko',
     supportedLngs: SUPPORTED_LANGUAGES.map((l) => l.code),
     load: 'currentOnly',
     interpolation: { escapeValue: false },

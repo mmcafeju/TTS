@@ -202,7 +202,7 @@ export function ProfileForm() {
     defaultValues: {
       name: '',
       description: '',
-      language: 'en',
+      language: 'ko',
       personality: '',
       sampleFile: undefined,
       referenceText: '',
@@ -407,7 +407,7 @@ export function ProfileForm() {
       form.reset({
         name: '',
         description: '',
-        language: 'en',
+        language: 'ko',
         personality: '',
         sampleFile: undefined,
         referenceText: undefined,
@@ -799,7 +799,7 @@ export function ProfileForm() {
         const draft: ProfileFormDraft = {
           name: values.name || '',
           description: values.description || '',
-          language: values.language || 'en',
+          language: values.language || 'ko',
           personality: values.personality || '',
           referenceText: values.referenceText || '',
           sampleMode,
@@ -862,7 +862,7 @@ export function ProfileForm() {
                     form.reset({
                       name: '',
                       description: '',
-                      language: 'en',
+                      language: 'ko',
                       personality: '',
                       sampleFile: undefined,
                       referenceText: '',
