@@ -195,6 +195,21 @@ const SECTIONS = [
       </ul>
 
       <div class="note">지시 문구는 구체적일수록 잘 반영됩니다. 결과가 마음에 안 들면 지시를 바꾸거나 <a href="#repaint">문장 단위 재생성</a>으로 해당 문장만 교정하세요.</div>
+
+      <h2>Qwen 사용법</h2>
+      <p>Qwen TTS는 <strong>내 목소리 클로닝</strong>과 <strong>표현 태그</strong>, Qwen CustomVoice는 <strong>감정·톤 지시</strong>를 지원합니다.</p>
+      <div class="step"><span class="num">1</span><div><h4>엔진 선택</h4><p>생성 박스의 엔진 선택에서 'Qwen3-TTS 1.7B'(클로닝) 또는 'Qwen CustomVoice 1.7B'(감정 지시)를 선택합니다. 지원 언어 10개.</p></div></div>
+      <div class="step"><span class="num">2</span><div><h4>내 목소리 복제</h4><p>음성 탭 → '새 음성' → '오디오에서 복제'에서 30초 내외 샘플 1개 + 참조 텍스트로 프로필 생성. (보이스 클로닝 섹션 참고)</p></div></div>
+      <div class="step"><span class="num">3</span><div><h4>표현 태그</h4><p>본문에 <code>[laugh]</code>·<code>[sigh]</code>·<code>[gasp]</code> 등 태그를 넣으면 웃음·한숨·놀람이 재현됩니다. 생성 박스의 😊 버튼 또는 직접 입력.</p></div></div>
+      <div class="step"><span class="num">4</span><div><h4>감정·톤 지시</h4><p>Qwen CustomVoice에서 '전달 지시사항 보기'로 감정·속도·톤을 문장으로 지시합니다.</p></div></div>
+      <div class="step"><span class="num">5</span><div><h4>생성</h4><p>'음성 생성' 실행. GPU 동작, 모델 자동 다운로드. 안 나오는 문장은 구간 재생성으로 교정.</p></div></div>
+
+      <h2>Supertonic 사용법</h2>
+      <p>Supertonic 3는 <strong>프리셋 목소리 10개</strong>(F1~F5 여성, M1~M5 남성)를 쓰는 초경량 엔진입니다. <strong>내 목소리 클로닝은 불가</strong>하고, <strong>CPU만으로</strong> 빠르게 동작합니다.</p>
+      <div class="step"><span class="num">1</span><div><h4>프로필 만들기</h4><p>음성 탭 → '새 음성' → '내장 음성' → 엔진 'Supertonic 3' 선택 → 목소리(F1~M5) 하나 선택 → 저장.</p></div></div>
+      <div class="step"><span class="num">2</span><div><h4>언어 선택</h4><p>Supertonic은 31개 언어 지원(한국어·영어·일본어·중국어·유럽·중동·동유럽 등). 언어 선택에서 원하는 언어를 고릅니다.</p></div></div>
+      <div class="step"><span class="num">3</span><div><h4>생성</h4><p>생성 박스에서 Supertonic 프로필 선택 → 텍스트 입력 → 생성. 처음이면 모델(~400MB) 자동 다운로드.</p></div></div>
+      <div class="note">전달 지시사항(감정)과 표현 태그는 Supertonic에서 지원되지 않습니다. 감정 표현이 필요하면 <strong>Qwen 엔진</strong>을 사용하세요.</div>
     `,
   },
   {

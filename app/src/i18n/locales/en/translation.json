@@ -926,6 +926,29 @@
           { "title": "Check the result", "body": "The full piece is saved as a single generation. Use the sentence markers over the waveform to inspect each segment." },
           { "title": "Fix specific parts", "body": "Click a sentence marker and use 'Regenerate Chunk' to fix only that part. (Tutorial 2)" }
         ]
+      },
+      "qwen-guide": {
+        "title": "Qwen Engine Guide",
+        "subtitle": "Clone your voice · expression tags · emotional direction",
+        "steps": [
+          { "title": "Pick the engine", "body": "In the generate box, choose 'Qwen3-TTS 1.7B' (clone your voice) or 'Qwen CustomVoice 1.7B' (direct emotion and tone). It supports 10 languages." },
+          { "title": "Clone your voice", "body": "Voices tab → 'New Voice' → 'Clone from audio'. One clean ~30s sample plus its reference text creates your profile. (See Tutorial 1)" },
+          { "title": "Add expression tags", "body": "Put tags like [laugh], [sigh], or [gasp] in the text and the model reproduces them. Use the 😊 button in the generate box, or type them directly." },
+          { "title": "Direct emotion and tone", "body": "With Qwen CustomVoice, open 'Delivery Instruction' and describe emotion, pace, and tone in words. (See Tutorial 4)" },
+          { "title": "Generate", "body": "Press 'Generate' with your text. Qwen TTS runs on the GPU and auto-downloads the model on first use." },
+          { "title": "Fine-tune", "body": "Click any sentence you dislike and use 'Regenerate Chunk' to fix it. (See Tutorial 2)" }
+        ]
+      },
+      "supertonic-guide": {
+        "title": "Supertonic Guide",
+        "subtitle": "Preset voices · 31 languages · CPU-only",
+        "steps": [
+          { "title": "Understand the engine", "body": "Supertonic 3 is a lightweight engine with 10 pre-built voices (F1–F5 female, M1–M5 male). It cannot clone your voice but runs fast on CPU only — no GPU needed." },
+          { "title": "Create a profile", "body": "Voices tab → 'New Voice' → 'Built-in voice' → choose engine 'Supertonic 3' → pick one voice (F1–M5) and save." },
+          { "title": "Pick a language", "body": "Supertonic supports 31 languages (Korean, English, Japanese, Chinese, European, Middle Eastern, Eastern European, etc.). Select the one you want." },
+          { "title": "Generate", "body": "Select the Supertonic profile in the generate box, type your text, and generate. On first use the ~400MB model auto-downloads." },
+          { "title": "Note the limits", "body": "Delivery instructions (emotion) and expression tags are not supported by Supertonic. Use the Qwen engine when you need emotional expression." }
+        ]
       }
     }
   },

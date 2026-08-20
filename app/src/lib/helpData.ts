@@ -80,7 +80,9 @@ export type HelpTutorialId =
   | 'repaint'
   | 'vc-tutorial'
   | 'instruct'
-  | 'long-text';
+  | 'long-text'
+  | 'qwen-guide'
+  | 'supertonic-guide';
 
 export const helpOverview: HelpOverview = {
   id: 'overview',
@@ -289,6 +291,38 @@ export const helpTutorials: HelpTutorial[] = [
       { ko: '청크 분할', en: 'Chunk Splitting' },
       { ko: '크로스페이드', en: 'Crossfade' },
       { ko: '문장 마커', en: 'Sentence Marker' },
+    ],
+  },
+  {
+    id: 'qwen-guide',
+    index: 6,
+    titleKey: 'help.tutorials.qwen-guide.title',
+    subtitleKey: 'help.tutorials.qwen-guide.subtitle',
+    icon: Sparkles,
+    featureId: 'generate',
+    targetPath: '/',
+    stepsKey: 'help.tutorials.qwen-guide.steps',
+    terms: [
+      { ko: 'Qwen TTS', en: 'Qwen TTS' },
+      { ko: 'Qwen CustomVoice', en: 'Qwen CustomVoice' },
+      { ko: '표현 태그', en: 'Expression Tags' },
+      { ko: '보이스 클로닝', en: 'Voice Cloning' },
+    ],
+  },
+  {
+    id: 'supertonic-guide',
+    index: 7,
+    titleKey: 'help.tutorials.supertonic-guide.title',
+    subtitleKey: 'help.tutorials.supertonic-guide.subtitle',
+    icon: Volume2,
+    featureId: 'generate',
+    targetPath: '/',
+    stepsKey: 'help.tutorials.supertonic-guide.steps',
+    terms: [
+      { ko: 'Supertonic 3', en: 'Supertonic 3' },
+      { ko: '프리셋 목소리', en: 'Preset Voice' },
+      { ko: 'CPU 전용', en: 'CPU-only' },
+      { ko: '다국어', en: 'Multilingual' },
     ],
   },
 ];
