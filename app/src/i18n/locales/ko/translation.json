@@ -729,6 +729,12 @@
       "ariaLabelActive": "캐릭터로 말하는 중",
       "ariaLabelInactive": "캐릭터로 말하기"
     },
+    "tags": {
+      "title": "표현 태그",
+      "ariaLabel": "표현 태그 삽입",
+      "tooltip": "표현 태그 (웃음, 한숨 등)",
+      "hint": "마침표·쉼표뿐 아니라 생각을 이어갈 때의 미세한 멈춤(Pause)도 재현합니다."
+    },
     "outputFormat": {
       "label": "출력 형식",
       "helpIcon": "오디오 규격 도움말",

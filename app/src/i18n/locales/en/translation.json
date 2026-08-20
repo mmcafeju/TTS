@@ -729,6 +729,12 @@
       "ariaLabelActive": "Speaking in character",
       "ariaLabelInactive": "Speak in character"
     },
+    "tags": {
+      "title": "Expression tags",
+      "ariaLabel": "Insert expression tag",
+      "tooltip": "Expression tags (laugh, sigh, etc.)",
+      "hint": "Reproduces micro-pauses between thoughts, beyond just periods and commas."
+    },
     "outputFormat": {
       "label": "Output format",
       "helpIcon": "Audio spec help",

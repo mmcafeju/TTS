@@ -13,7 +13,7 @@ import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils/cn';
 
 // ── Tag definitions ─────────────────────────────────────────────────
-const PARALINGUISTIC_TAGS = [
+export const PARALINGUISTIC_TAGS = [
   { tag: '[laugh]', label: 'laugh', emoji: '\u{1F602}' },
   { tag: '[chuckle]', label: 'chuckle', emoji: '\u{1F60F}' },
   { tag: '[gasp]', label: 'gasp', emoji: '\u{1F62E}' },
@@ -337,6 +337,8 @@ export const ParalinguisticInput = forwardRef<ParalinguisticInputRef, Paralingui
         )}
 
         {/* Editable area */}
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: contentEditable rich-text editor acts as a textbox; role/handlers are intentional. */}
+        {/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: contentEditable div legitimately exposes a textbox role with aria-multiline. */}
         <div
           ref={editorRef}
           contentEditable={!disabled}

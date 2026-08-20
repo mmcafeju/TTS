@@ -1,11 +1,12 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link, useMatchRoute } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Dices, Info, Loader2, SlidersHorizontal, Sparkles, Wand2 } from 'lucide-react';
+import { Dices, Info, Loader2, SlidersHorizontal, Smile, Sparkles, Wand2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -27,6 +28,7 @@ import { useStoryStore } from '@/stores/storyStore';
 import { useUIStore } from '@/stores/uiStore';
 import { AudioFormatHelpDialog } from './AudioFormatHelpDialog';
 import { EngineModelSelector } from './EngineModelSelector';
+import { PARALINGUISTIC_TAGS } from './ParalinguisticInput';
 
 interface FloatingGenerateBoxProps {
   isPlayerOpen?: boolean;
@@ -45,6 +47,7 @@ export function FloatingGenerateBox({
   const { data: profiles } = useProfiles();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isInstructExpanded, setIsInstructExpanded] = useState(false);
+  const [tagPickerOpen, setTagPickerOpen] = useState(false);
   const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
   const [outputFormat, setOutputFormat] = useState<'original' | 'broadcast' | 'cd' | 'mp3'>('original');
   const containerRef = useRef<HTMLDivElement>(null);
@@ -70,6 +73,22 @@ export function FloatingGenerateBox({
       });
     },
   });
+
+  // Insert an expression tag (e.g. [laugh]) at the textarea cursor position.
+  const insertExpressionTag = (tag: string) => {
+    const el = textareaRef.current;
+    if (!el) return;
+    const start = el.selectionStart ?? el.value.length;
+    const end = el.selectionEnd ?? el.value.length;
+    const next = `${el.value.slice(0, start)}${tag} ${el.value.slice(end)}`;
+    form.setValue('text', next, { shouldDirty: true });
+    setTagPickerOpen(false);
+    requestAnimationFrame(() => {
+      el.focus();
+      const pos = start + tag.length + 1;
+      el.setSelectionRange(pos, pos);
+    });
+  };
 
   // Fetch effect presets for the dropdown
   const { data: effectPresets } = useQuery({
@@ -447,6 +466,65 @@ export function FloatingGenerateBox({
                         </Button>
                         <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap rounded-md bg-popover px-3 py-1.5 text-xs text-popover-foreground border border-border opacity-0 transition-opacity group-hover:opacity-100 z-[9999]">
                           {t('generation.instruct.tooltip')}
+                        </span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Expression tags — insert paralinguistic tags like [laugh] at the caret. */}
+                <AnimatePresence>
+                  {isExpanded && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="group relative">
+                        <Popover
+                          open={tagPickerOpen}
+                          onOpenChange={setTagPickerOpen}
+                        >
+                          <PopoverTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              disabled={!selectedProfileId}
+                              className="h-10 w-10 rounded-full bg-card border border-border hover:bg-background/50 transition-all duration-200"
+                              aria-label={t('generation.tags.ariaLabel')}
+                            >
+                              <Smile className="h-4 w-4" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent side="top" align="end" className="w-72">
+                            <div className="mb-2 px-1 text-xs font-medium text-muted-foreground">
+                              {t('generation.tags.title')}
+                            </div>
+                            <div className="grid grid-cols-1 gap-0.5">
+                              {PARALINGUISTIC_TAGS.map((tag) => (
+                                <button
+                                  key={tag.tag}
+                                  type="button"
+                                  onClick={() => insertExpressionTag(tag.tag)}
+                                  className="flex items-center gap-2 w-full px-2 py-1.5 text-sm text-left rounded-md hover:bg-accent/20 transition-colors"
+                                >
+                                  <span className="text-base leading-none">{tag.emoji}</span>
+                                  <span>{tag.label}</span>
+                                  <span className="ml-auto text-xs text-muted-foreground font-mono">
+                                    {tag.tag}
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                            <p className="mt-2 border-t border-border pt-2 px-1 text-xs text-muted-foreground">
+                              {t('generation.tags.hint')}
+                            </p>
+                          </PopoverContent>
+                        </Popover>
+                        <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap rounded-md bg-popover px-3 py-1.5 text-xs text-popover-foreground border border-border opacity-0 transition-opacity group-hover:opacity-100 z-[9999]">
+                          {t('generation.tags.tooltip')}
                         </span>
                       </div>
                     </motion.div>
