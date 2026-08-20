@@ -143,7 +143,7 @@ async function main() {
   })()`);
   log(`edit panel snapshot: ${JSON.stringify(editPanel)}`);
   if (!editPanel) throw new Error('edit panel did not appear after selecting chunk 2');
-  if (editPanel.textValue !== 'Here is the second sentence to fix.') {
+  if (editPanel.textValue !== '여기 고쳐야 할 두 번째 문장이 있습니다.') {
     throw new Error(`chunk 2 text prefill wrong: "${editPanel.textValue}"`);
   }
   if (!editPanel.hasSeed) throw new Error('seed input missing');
@@ -153,13 +153,13 @@ async function main() {
   await evalValue(cdp, `(() => {
     const input = [...document.querySelectorAll('input')].find(i => i.placeholder && /수정|Correct/.test(i.placeholder));
     const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
-    setter.call(input, 'Here is the fixed second sentence.');
+    setter.call(input, '여기 수정된 두 번째 문장이 있습니다.');
     input.dispatchEvent(new Event('input', { bubbles: true }));
   })()`);
   await sleep(300);
   const updated = await evalValue(cdp, `[...document.querySelectorAll('input')].find(i => i.placeholder && /수정|Correct/.test(i.placeholder))?.value`);
   log(`after typing, text value: ${updated}`);
-  if (updated !== 'Here is the fixed second sentence.') throw new Error('text input did not update');
+  if (updated !== '여기 수정된 두 번째 문장이 있습니다.') throw new Error('text input did not update');
 
   // 7. Select a different chunk (chip 1) and confirm prefill resets.
   await evalValue(cdp, `(() => {
@@ -169,7 +169,7 @@ async function main() {
   await sleep(500);
   const chip1 = await evalValue(cdp, `[...document.querySelectorAll('input')].find(i => i.placeholder && /수정|Correct/.test(i.placeholder))?.value`);
   log(`chunk 1 prefill: ${chip1}`);
-  if (chip1 !== 'Hello, this is the first sentence.') throw new Error(`chunk 1 prefill wrong: "${chip1}"`);
+  if (chip1 !== '안녕하세요, 이것은 첫 번째 문장입니다.') throw new Error(`chunk 1 prefill wrong: "${chip1}"`);
 
   log(`console errors: ${consoleErrors.length === 0 ? 'none' : consoleErrors.join(' | ')}`);
   if (consoleErrors.length > 0) throw new Error('console errors present');
