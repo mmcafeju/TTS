@@ -48,6 +48,30 @@ export const ALL_LANGUAGES = {
 
 export type LanguageCode = keyof typeof ALL_LANGUAGES;
 
+/**
+ * Preferred display order — Korean, English, Japanese, Chinese first,
+ * then everything else alphabetically by label.
+ */
+const LANGUAGE_PRIORITY: Record<string, number> = {
+  ko: 0,
+  en: 1,
+  ja: 2,
+  zh: 3,
+};
+
+export function sortLanguageOptions<T extends { value: string; label: string }>(
+  options: readonly T[],
+): T[] {
+  return [...options].sort((a, b) => {
+    const pa = LANGUAGE_PRIORITY[a.value];
+    const pb = LANGUAGE_PRIORITY[b.value];
+    if (pa !== undefined && pb !== undefined) return pa - pb;
+    if (pa !== undefined) return -1;
+    if (pb !== undefined) return 1;
+    return a.label.localeCompare(b.label);
+  });
+}
+
 /** Per-engine supported language codes. */
 export const ENGINE_LANGUAGES: Record<string, readonly LanguageCode[]> = {
   qwen: ['zh', 'en', 'ja', 'ko', 'de', 'fr', 'ru', 'pt', 'es', 'it'],
@@ -90,16 +114,20 @@ export const ENGINE_LANGUAGES: Record<string, readonly LanguageCode[]> = {
 /** Helper: get language options for a given engine. */
 export function getLanguageOptionsForEngine(engine: string) {
   const codes = ENGINE_LANGUAGES[engine] ?? ENGINE_LANGUAGES.qwen;
-  return codes.map((code) => ({
-    value: code,
-    label: ALL_LANGUAGES[code],
-  }));
+  return sortLanguageOptions(
+    codes.map((code) => ({
+      value: code,
+      label: ALL_LANGUAGES[code],
+    })),
+  );
 }
 
 // ── Backwards-compatible exports used elsewhere ──────────────────────
 export const SUPPORTED_LANGUAGES = ALL_LANGUAGES;
 export const LANGUAGE_CODES = Object.keys(ALL_LANGUAGES) as LanguageCode[];
-export const LANGUAGE_OPTIONS = LANGUAGE_CODES.map((code) => ({
-  value: code,
-  label: ALL_LANGUAGES[code],
-}));
+export const LANGUAGE_OPTIONS = sortLanguageOptions(
+  LANGUAGE_CODES.map((code) => ({
+    value: code,
+    label: ALL_LANGUAGES[code],
+  })),
+);

@@ -12,15 +12,15 @@ import zhCN from './locales/zh-CN/translation.json';
 import zhTW from './locales/zh-TW/translation.json';
 
 export const SUPPORTED_LANGUAGES = [
-  { code: 'en', label: 'English' },
-  { code: 'es', label: 'Español' },
-  { code: 'pt-BR', label: 'Português (Brasil)' },
-  { code: 'ja', label: '日本語' },
   { code: 'ko', label: '한국어' },
+  { code: 'en', label: 'English' },
+  { code: 'ja', label: '日本語' },
   { code: 'zh-CN', label: '简体中文' },
   { code: 'zh-TW', label: '繁體中文' },
+  { code: 'es', label: 'Español' },
   { code: 'fr', label: 'Français' },
   { code: 'it', label: 'Italiano' },
+  { code: 'pt-BR', label: 'Português (Brasil)' },
 ] as const;
 
 export type LanguageCode = (typeof SUPPORTED_LANGUAGES)[number]['code'];
