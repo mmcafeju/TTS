@@ -565,12 +565,18 @@ export interface DriveLoginStartResponse {
   authorize_url: string;
 }
 
+export interface DriveCredentialsRequest {
+  client_id: string;
+  client_secret: string;
+}
+
 export interface DriveStatus {
   connected: boolean;
   account_email: string | null;
   connected_at: string | null;
   last_backup_at: string | null;
   folder_name: string | null;
+  credentials_configured: boolean;
 }
 
 export interface DriveBackupResponse {

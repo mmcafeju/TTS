@@ -261,3 +261,20 @@ def get_google_credentials() -> tuple[str | None, str | None]:
 def get_google_credentials_file() -> Path:
     """Path to the JSON credentials file users fill in once."""
     return _data_dir / "google_drive.json"
+
+
+def save_google_credentials(client_id: str, client_secret: str) -> Path:
+    """Persist OAuth credentials to the JSON credentials file.
+
+    Returns the path written, so callers can surface it in logs/errors.
+    """
+    import json as _json
+
+    creds_file = get_google_credentials_file()
+    _data_dir.mkdir(parents=True, exist_ok=True)
+    creds_file.write_text(
+        _json.dumps({"client_id": client_id, "client_secret": client_secret}, indent=2),
+        encoding="utf-8",
+    )
+    logger.info("saved google drive credentials to %s", creds_file)
+    return creds_file

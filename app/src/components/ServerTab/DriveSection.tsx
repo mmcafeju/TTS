@@ -1,8 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Cloud, FolderSync, Loader2 } from 'lucide-react';
+import { Cloud, FolderSync, KeyRound, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { apiClient } from '@/lib/api/client';
 import { SettingRow, SettingSection } from './SettingRow';
@@ -17,6 +19,8 @@ export function DriveSection() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [polling, setPolling] = useState(false);
+  const [clientId, setClientId] = useState('');
+  const [clientSecret, setClientSecret] = useState('');
 
   const { data: status } = useQuery({
     queryKey: ['drive-status'],
@@ -79,6 +83,25 @@ export function DriveSection() {
     },
   });
 
+  const saveCredentials = useMutation({
+    mutationFn: () => apiClient.saveDriveCredentials(clientId, clientSecret),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['drive-status'] });
+      setClientId('');
+      setClientSecret('');
+      toast({
+        title: t('settings.general.drive.credentialsSavedTitle'),
+        description: t('settings.general.drive.credentialsSavedDescription'),
+      });
+    },
+    onError: (error: Error) =>
+      toast({
+        title: t('settings.general.drive.credentialsSaveFailedTitle'),
+        description: error.message,
+        variant: 'destructive',
+      }),
+  });
+
   const backup = useMutation({
     mutationFn: () => apiClient.runDriveBackup(),
     onSuccess: (result) => {
@@ -117,6 +140,7 @@ export function DriveSection() {
   });
 
   const busy = startLogin.isPending || polling;
+  const configured = status?.credentials_configured ?? false;
 
   const backupInfo = status?.last_backup_at
     ? t('settings.general.drive.lastBackup', { time: new Date(status.last_backup_at).toLocaleString() })
@@ -135,7 +159,9 @@ export function DriveSection() {
                 email: status?.account_email ?? 'your Google account',
                 backupInfo,
               })
-            : t('settings.general.drive.notConnectedDescription')
+            : configured
+              ? t('settings.general.drive.credentialsConfiguredHint')
+              : t('settings.general.drive.notConnectedDescription')
         }
         action={
           connected ? (
@@ -188,6 +214,52 @@ export function DriveSection() {
           )
         }
       />
+
+      {!connected && !configured && (
+        <SettingRow
+          title={t('settings.general.drive.credentialsTitle')}
+          description={t('settings.general.drive.credentialsDescription')}
+        >
+          <div className="w-full space-y-3">
+            <div className="space-y-1">
+              <Label htmlFor="drive-client-id">
+                {t('settings.general.drive.clientIdLabel')}
+              </Label>
+              <Input
+                id="drive-client-id"
+                value={clientId}
+                onChange={(e) => setClientId(e.target.value)}
+                placeholder={t('settings.general.drive.clientIdPlaceholder')}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="drive-client-secret">
+                {t('settings.general.drive.clientSecretLabel')}
+              </Label>
+              <Input
+                id="drive-client-secret"
+                type="password"
+                value={clientSecret}
+                onChange={(e) => setClientSecret(e.target.value)}
+                placeholder={t('settings.general.drive.clientSecretPlaceholder')}
+              />
+            </div>
+            <Button
+              disabled={saveCredentials.isPending || !clientId.trim() || !clientSecret.trim()}
+              onClick={() => saveCredentials.mutate()}
+              size="sm"
+              variant="outline"
+            >
+              {saveCredentials.isPending ? (
+                <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+              ) : (
+                <KeyRound className="h-3.5 w-3.5 mr-1.5" />
+              )}
+              {t('settings.general.drive.credentialsSaveButton')}
+            </Button>
+          </div>
+        </SettingRow>
+      )}
 
       {connected && (
         <SettingRow

@@ -118,6 +118,32 @@ def test_backup_not_connected(client):
     assert resp.json()["success"] is False
 
 
+def test_credentials_save_success(client):
+    with patch("backend.services.drive.save_credentials"), \
+         patch("backend.services.drive.get_status", return_value={
+             "connected": False,
+             "account_email": None,
+             "connected_at": None,
+             "last_backup_at": None,
+             "folder_name": "voicebox",
+             "credentials_configured": True,
+         }):
+        resp = client.post("/drive/credentials", json={
+            "client_id": "12345.apps.googleusercontent.com",
+            "client_secret": "GOCSPX-secret",
+        })
+    assert resp.status_code == 200
+    assert resp.json()["credentials_configured"] is True
+
+
+def test_credentials_save_missing_400(client):
+    with patch("backend.services.drive.save_credentials",
+               side_effect=RuntimeError("Both the Client ID and Client Secret are required.")):
+        resp = client.post("/drive/credentials", json={"client_id": "", "client_secret": ""})
+    assert resp.status_code == 400
+    assert "Client ID" in resp.json()["detail"]
+
+
 def test_callback_success_html(client):
     with patch("backend.services.drive.handle_callback", return_value=(True, "Connected")):
         resp = client.get("/drive/callback", params={"code": "abc", "state": "xyz"})

@@ -863,6 +863,14 @@ class DriveLoginStartResponse(BaseModel):
     authorize_url: str
 
 
+class DriveCredentialsRequest(BaseModel):
+    """OAuth client_id/client_secret provided by the user via the UI. Stored in
+    the credentials file so the desktop can authenticate to Google."""
+
+    client_id: str
+    client_secret: str
+
+
 class DriveStatusResponse(BaseModel):
     """Current link between this device and a Google Drive account."""
 
@@ -871,6 +879,7 @@ class DriveStatusResponse(BaseModel):
     connected_at: Optional[datetime] = None
     last_backup_at: Optional[datetime] = None
     folder_name: Optional[str] = None
+    credentials_configured: bool = False
 
 
 class DriveBackupResponse(BaseModel):

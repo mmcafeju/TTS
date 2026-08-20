@@ -219,13 +219,24 @@ def get_status(db: Session) -> dict:
     """Local view of the Drive link — never returns tokens."""
     row = _get_or_create_row(db)
     connected = bool(row.refresh_token)
+    client_id, _ = config.get_google_credentials()
     return {
         "connected": connected,
         "account_email": row.account_email if connected else None,
         "connected_at": row.connected_at if connected else None,
         "last_backup_at": row.last_backup_at if connected else None,
         "folder_name": ROOT_FOLDER_NAME,
+        "credentials_configured": bool(client_id),
     }
+
+
+def save_credentials(client_id: str, client_secret: str) -> dict:
+    """Persist OAuth credentials from the UI and report the new status."""
+    if not client_id or not client_secret:
+        raise RuntimeError("Both the Client ID and Client Secret are required.")
+    config.save_google_credentials(client_id.strip(), client_secret.strip())
+    logger.info("saved google drive OAuth credentials via UI")
+    return {"credentials_configured": True}
 
 
 def disconnect(db: Session) -> None:

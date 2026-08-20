@@ -975,6 +975,13 @@ class ApiClient {
     return this.request<DriveLoginStartResponse>('/drive/login/start', { method: 'POST' });
   }
 
+  async saveDriveCredentials(client_id: string, client_secret: string): Promise<DriveStatus> {
+    return this.request<DriveStatus>('/drive/credentials', {
+      method: 'POST',
+      body: JSON.stringify({ client_id, client_secret }),
+    });
+  }
+
   async runDriveBackup(): Promise<DriveBackupResponse> {
     return this.request<DriveBackupResponse>('/drive/backup', { method: 'POST' });
   }

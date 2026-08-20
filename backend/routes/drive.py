@@ -78,6 +78,15 @@ async def drive_status(db: Session = Depends(get_db)):
     return models.DriveStatusResponse(**drive_service.get_status(db))
 
 
+@router.post("/credentials", response_model=models.DriveStatusResponse)
+async def drive_save_credentials(payload: models.DriveCredentialsRequest, db: Session = Depends(get_db)):
+    try:
+        drive_service.save_credentials(payload.client_id, payload.client_secret)
+    except RuntimeError as exc:
+        return JSONResponse(status_code=400, content={"detail": str(exc)})
+    return models.DriveStatusResponse(**drive_service.get_status(db))
+
+
 @router.post("/backup", response_model=models.DriveBackupResponse)
 async def drive_backup(db: Session = Depends(get_db)):
     return models.DriveBackupResponse(**await drive_service.run_backup(db))
